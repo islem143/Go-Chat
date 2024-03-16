@@ -1,46 +1,63 @@
 package routes
 
 import (
-	"context"
 	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/islem143/go-chat/database"
 	"github.com/islem143/go-chat/models"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+func extractKeyFromErrorMessage(message string) string {
+	parts := strings.Split(message, "{ : \"")
+	if len(parts) < 2 {
+		return "" // unable to extract
+	}
+	key := strings.Split(parts[1], "\"")[0]
+	return key
+}
 func IsDup(err error) bool {
 	var e mongo.WriteException
 	if errors.As(err, &e) {
 		for _, we := range e.WriteErrors {
 			if we.Code == 11000 {
+				fmt.Println(extractKeyFromErrorMessage(we.Details.String()))
 				return true
 			}
 		}
 	}
 	return false
 }
+
 func Setup(app *fiber.App) {
 	api := app.Group("/")
 
 	api.Get("/", func(c *fiber.Ctx) error {
-		return fiber.NewError(fiber.StatusServiceUnavailable, "On vacation!")
 
-		user := models.User{Name: "islem", Email: "test@test.com"}
-		result, err := database.Client.Database(database.Database).Collection("users").InsertOne(context.TODO(), user)
+		//user := models.User{Name: "islem", Email: "test@test.com"}
+		user, err := models.FindUserByEmail("test@ŧest.com")
 		if err != nil {
-			if IsDup(err) {
-				return c.JSON("duplciate email")
-			}
+			return err
 
 		}
-		return c.JSON(result)
+		return c.JSON(user)
+
 	})
-	// api.Get("/get-user/", controllers.User)
-	// api.Post("/register", controllers.Register)
+	api.Post("/", func(c *fiber.Ctx) error {
 
-	// api.Post("/login", controllers.Login)
+		user := new(models.User)
+		if err := c.BodyParser(user); err != nil {
+			return err
+		}
+		err := models.InsertUser(user)
+		if err != nil {
+			return err
+		}
 
-	// api.Post("/logout", controllers.Logout)
+		return c.JSON(user)
+
+	})
+
 }
