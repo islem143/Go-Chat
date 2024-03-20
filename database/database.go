@@ -49,7 +49,7 @@ func SetUp() {
 func SetUpUserModelIndex() {
 	coll := Client.Database(Database).Collection("users")
 	indexModel := mongo.IndexModel{
-		Keys:    bson.M{"email": 2},
+		Keys:    bson.M{"email": 1},
 		Options: options.Index().SetUnique(true),
 	}
 

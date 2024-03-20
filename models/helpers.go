@@ -3,6 +3,7 @@ package models
 import (
 	"context"
 
+	"github.com/gofiber/fiber/v2/log"
 	myerrors "github.com/islem143/go-chat/Errors"
 	"github.com/islem143/go-chat/database"
 	"go.mongodb.org/mongo-driver/bson"
@@ -20,7 +21,7 @@ func FindAll(collection string, results Document) error {
 			results = nil
 			return err
 		}
-
+		log.Error(err)
 		return &myerrors.MyError{Code: 500, Message: "internal server error"}
 
 	}
@@ -40,7 +41,7 @@ func FindOne(collection string, filter bson.M, result Document) error {
 			result = nil
 			return err
 		}
-
+		log.Error(err)
 		return &myerrors.MyError{Code: 500, Message: "internal server error"}
 
 	}
@@ -54,7 +55,7 @@ func Insert(collection string, data Document) error {
 	_, err := coll.InsertOne(context.TODO(), data)
 
 	if err != nil {
-
+		log.Error(err)
 		return &myerrors.MyError{Code: 500, Message: "internal server error"}
 	}
 	return nil

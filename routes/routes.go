@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	apis "github.com/islem143/go-chat/Api"
 	myerrors "github.com/islem143/go-chat/Errors"
 	"github.com/islem143/go-chat/models"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -47,7 +48,8 @@ func Setup(app *fiber.App) {
 			return err
 
 		}
-		return c.JSON(users)
+
+		return c.JSON(apis.ApiResponseList{List: users})
 
 	})
 	api.Get("/:id", func(c *fiber.Ctx) error {

@@ -12,10 +12,10 @@ type Model interface {
 }
 
 type User struct {
-	ID       string `json:"id" bson:"_id,omitempty"`
-	Name     string `json:"name" bson:"name,omitempty"`
-	Email    string `json:"email" bson:"email,omitempty"`
-	Password []byte `json:"-"`
+	ID    string `json:"id" bson:"_id,omitempty"`
+	Name  string `json:"name" bson:"name,omitempty"`
+	Email string `json:"email" bson:"email,omitempty"`
+	//Password []byte `json:"-"`
 }
 
 func (user *User) Collection() string {
@@ -61,6 +61,7 @@ func FindAllUsers() (*[]User, error) {
 func InsertUser(user *User) error {
 	err := Insert(user.Collection(), user)
 	if err != nil {
+
 		return err
 	}
 	return nil
