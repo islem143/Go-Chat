@@ -1,21 +1,29 @@
 package main
 
 import (
+	"errors"
+
 	"github.com/gofiber/fiber/v2"
+	myerrors "github.com/islem143/go-chat/Errors"
 	"github.com/islem143/go-chat/database"
-	"github.com/islem143/go-chat/models"
 	"github.com/islem143/go-chat/routes"
 )
 
 func main() {
 
 	database.Connect()
-	models.SetUp()
+
 	app := fiber.New(fiber.Config{
 		// Global custom error handler
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
-
-			return c.Status(fiber.StatusBadRequest).JSON(err)
+			code := fiber.StatusInternalServerError
+			message := "internal server error"
+			var e *myerrors.ApiError
+			if errors.As(err, &e) {
+				code = e.Code
+				return c.Status(code).JSON(e)
+			}
+			return c.Status(code).JSON(message)
 		},
 	})
 	// app.Use(cors.New(cors.Config{

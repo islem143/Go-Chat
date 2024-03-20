@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -37,5 +38,25 @@ func Connect() {
 	}
 
 	fmt.Println("Pinged your deployment. You successfully connected to MongoDB!")
+	SetUp()
+}
+
+func SetUp() {
+	SetUpUserModelIndex()
+
+}
+
+func SetUpUserModelIndex() {
+	coll := Client.Database(Database).Collection("users")
+	indexModel := mongo.IndexModel{
+		Keys:    bson.M{"email": 2},
+		Options: options.Index().SetUnique(true),
+	}
+
+	// Create the index
+	_, err := coll.Indexes().CreateOne(context.Background(), indexModel)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 }

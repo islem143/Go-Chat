@@ -1,10 +1,22 @@
 package myerrors
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 type MongoError struct {
 	Message string
 	Code    int
+}
+
+type MyError struct {
+	Code    int
+	Message string
+}
+
+func (err *MyError) Error() string {
+	return fmt.Sprintf("%s with code %d", err.Message, err.Code)
 }
 
 var ErrDocumentNotFound = errors.New("document not found")
@@ -17,7 +29,7 @@ func (m *MongoError) Error() string {
 
 type ApiError struct {
 	Message string `json:"message"`
-	Code    int
+	Code    int    `json:"code"`
 }
 
 func (e *ApiError) Error() string {
@@ -34,10 +46,11 @@ func NewApiError(status int, message string) *ApiError {
 
 func NotFoundError(message string) *ApiError {
 	return NewApiError(404, message)
-
 }
 
 func InternalServerError(message string) *ApiError {
 	return NewApiError(500, message)
-
+}
+func RecordExistsError(record string) *ApiError {
+	return NewApiError(400, record+" already exists.")
 }
