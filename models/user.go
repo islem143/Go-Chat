@@ -8,9 +8,11 @@ import (
 )
 
 type User struct {
-	ID       string `json:"id" bson:"_id,omitempty"`
-	Name     string `json:"name" bson:"name,omitempty"`
-	Email    string `json:"email" bson:"email,omitempty"`
+	ID      string `json:"id" bson:"_id,omitempty"`
+	Name    string `json:"name" bson:"name,omitempty"`
+	Email   string `json:"email" bson:"email,omitempty"`
+	Picture string `json:"picture" bson:"picture,omitempty"`
+	//Role     string `json:"role" bson:"role,omitempty"`
 	Password []byte `json:"-"`
 }
 
@@ -46,7 +48,7 @@ func FindUser(key string, value string) (*User, error) {
 func FindAllUsers() (*[]User, error) {
 
 	users := &[]User{}
-	err := FindAll("users", users)
+	err := FindAll("users", users, nil)
 	if err != nil {
 
 		return nil, err

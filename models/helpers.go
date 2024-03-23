@@ -12,7 +12,7 @@ import (
 
 type Document interface{}
 
-func FindAll(collection string, results Document) error {
+func FindAll(collection string, results Document, filter bson.M) error {
 
 	coll := database.Client.Database(database.Database).Collection(collection)
 	cursor, err := coll.Find(context.TODO(), bson.D{})

@@ -3,6 +3,8 @@ package myerrors
 import (
 	"errors"
 	"fmt"
+
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type MongoError struct {
@@ -53,4 +55,12 @@ func InternalServerError(message string) *ApiError {
 }
 func RecordExistsError(record string) *ApiError {
 	return NewApiError(400, record+" already exists.")
+}
+
+func UnauthorizedError() *ApiError {
+	return NewApiError(401, "unauthorized")
+}
+
+func DocumentNotFoundError(err error) bool {
+	return err == mongo.ErrNoDocuments
 }

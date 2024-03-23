@@ -50,6 +50,7 @@ func Register(c *fiber.Ctx) error {
 		Name:     data["name"],
 		Email:    data["email"],
 		Password: password,
+		//Role:     types.USER,
 	}
 	err = models.InsertUser(user)
 	if err != nil {
@@ -161,43 +162,33 @@ func Login(c *fiber.Ctx) error {
 
 }
 
-// func User(c *fiber.Ctx) error {
+func User(c *fiber.Ctx) error {
+	messages, err := models.FindMessages("user_id", "4")
+	if err == mongo.ErrNoDocuments {
+		return myerrors.NotFoundError("document not Found")
 
-// 	cookie := c.Cookies("jwt")
+	}
+	if err != nil {
+		return err
 
-// 	token, err := jwt.ParseWithClaims(cookie, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
-// 		return []byte(SecretKey), nil //using the SecretKey which was generated in th Login function
-// 	})
+	}
 
-// 	if err != nil {
-// 		c.Status(fiber.StatusUnauthorized)
-// 		return c.JSON(fiber.Map{
-// 			"message": "unauthenticated",
-// 		})
-// 	}
+	return c.JSON(ApiResponseList{List: messages})
 
-// 	claims := token.Claims.(*jwt.RegisteredClaims)
+}
 
-// 	var user models.User
+func Logout(c *fiber.Ctx) error {
+	cookie := fiber.Cookie{
+		Name:     "jwt",
+		Value:    "",
+		Expires:  time.Now().Add(-time.Hour), //Sets the expiry time an hour ago in the past.
+		HTTPOnly: true,
+	}
 
-// 	database.DB.Where("id = ?", claims.Issuer).First(&user)
+	c.Cookie(&cookie)
 
-// 	return c.JSON(user)
+	return c.JSON(fiber.Map{
+		"message": "success",
+	})
 
-// }
-
-// func Logout(c *fiber.Ctx) error {
-// 	cookie := fiber.Cookie{
-// 		Name:     "jwt",
-// 		Value:    "",
-// 		Expires:  time.Now().Add(-time.Hour), //Sets the expiry time an hour ago in the past.
-// 		HTTPOnly: true,
-// 	}
-
-// 	c.Cookie(&cookie)
-
-// 	return c.JSON(fiber.Map{
-// 		"message": "success",
-// 	})
-
-// }
+}
