@@ -28,9 +28,11 @@ func Register(c *fiber.Ctx) error {
 	})
 	if valError != nil {
 		log.Error(valError)
-		return valError
+
+		return myerrors.ClientBodyError(valError.Message)
 	}
 	dbuser, err := models.FindUser("email", data["email"])
+
 	if err != nil && err != mongo.ErrNoDocuments {
 		log.Error(err)
 		return myerrors.InternalServerError("interal server error")
@@ -114,7 +116,7 @@ func Login(c *fiber.Ctx) error {
 
 	if valError != nil {
 		log.Error(valError)
-		return valError
+		return myerrors.ClientBodyError(valError.Message)
 	}
 
 	user, err := models.FindUser("email", data["email"])

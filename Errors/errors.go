@@ -46,6 +46,10 @@ func NewApiError(status int, message string) *ApiError {
 	}
 }
 
+func ClientBodyError(message string) *ApiError {
+	return NewApiError(422, message)
+}
+
 func NotFoundError(message string) *ApiError {
 	return NewApiError(404, message)
 }

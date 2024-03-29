@@ -23,7 +23,10 @@ type (
 		Tag         string
 		Value       interface{}
 	}
-
+	MessageRequestValidator struct {
+		Message    string `json:"message" validate:"required"`
+		ReceiverId string `json:"receiver_id" validate:"required"`
+	}
 	XValidator struct {
 		Validator *validator.Validate
 	}

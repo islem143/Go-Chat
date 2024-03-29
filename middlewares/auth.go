@@ -1,8 +1,6 @@
 package middlewares
 
 import (
-	"fmt"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/golang-jwt/jwt/v5"
@@ -33,7 +31,7 @@ func IsAuth(c *fiber.Ctx) error {
 		if myerrors.DocumentNotFoundError(err) {
 			return myerrors.NotFoundError("user not found")
 		} else if err != nil {
-			fmt.Println("tyyyyyyyyyyy")
+
 			return myerrors.InternalServerError("internal server error")
 		}
 
