@@ -27,12 +27,13 @@ func FindAll(collection string, results Document, filter bson.M) error {
 	}
 
 	if err = cursor.All(context.TODO(), results); err != nil {
+
 		panic(err)
 	}
 
 	return nil
 }
-func FindOne(collection string, filter bson.M, result Document) error {
+func FindOne(collection string, filter bson.M, result Model) error {
 
 	coll := database.Client.Database(database.Database).Collection(collection)
 	err := coll.FindOne(context.TODO(), filter).Decode(result)
@@ -49,9 +50,11 @@ func FindOne(collection string, filter bson.M, result Document) error {
 	return nil
 }
 
-func Insert(collection string, data Document) error {
+func Insert(collection string, model Model) error {
 	coll := database.Client.Database(database.Database).Collection(collection)
-
+	model.SetCreatedAt()
+	model.SetUpdatedAt()
+	data := any(model)
 	_, err := coll.InsertOne(context.TODO(), data)
 
 	if err != nil {

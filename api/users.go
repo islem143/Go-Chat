@@ -52,9 +52,8 @@ func Register(c *fiber.Ctx) error {
 		Name:     data["name"],
 		Email:    data["email"],
 		Password: password,
-		//Role:     types.USER,
 	}
-	err = models.InsertUser(user)
+	err = models.Insert(user.CollectionName(), user)
 	if err != nil {
 
 		return myerrors.InternalServerError("interal server error")
@@ -161,21 +160,6 @@ func Login(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"message": "success",
 	})
-
-}
-
-func User(c *fiber.Ctx) error {
-	messages, err := models.FindMessages("user_id", "4")
-	if err == mongo.ErrNoDocuments {
-		return myerrors.NotFoundError("document not Found")
-
-	}
-	if err != nil {
-		return err
-
-	}
-
-	return c.JSON(ApiResponseList{List: messages})
 
 }
 

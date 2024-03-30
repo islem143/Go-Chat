@@ -15,7 +15,7 @@ func Setup(app *fiber.App) {
 	api.Get("users/:id", apis.One)
 	api.Post("users/logout", apis.Logout)
 	//api.Use(middlewares.HasRole(types.ADMIN))
-	api.Get("user", apis.User)
+
 	messages := app.Group("/messages")
 	messages.Get("/", apis.GetMessages)
 	messages.Post("/", apis.InsertMessage)
