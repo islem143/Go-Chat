@@ -88,6 +88,7 @@ func One(c *fiber.Ctx) error {
 		return err
 	}
 	user, err := models.FindUserById(id)
+
 	if err == mongo.ErrNoDocuments {
 		return myerrors.NotFoundError("document not Found")
 

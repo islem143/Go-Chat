@@ -1,7 +1,7 @@
 package models
 
 type Message struct {
-	BaseModel
+	BaseModel  `bson:",inline"`
 	ReceiverId string `json:"receiver_id" bson:"receiver_id,omitempty"`
 	UserId     string `json:"user_id" bson:"user_id,omitempty"`
 	Text       string `json:"text" bson:"text,omitempty"`

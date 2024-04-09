@@ -6,13 +6,12 @@ import (
 	"github.com/gofiber/fiber/v2/log"
 	myerrors "github.com/islem143/go-chat/Errors"
 	"github.com/islem143/go-chat/database"
+	"github.com/islem143/go-chat/types"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type Document interface{}
-
-func FindAll(collection string, results Document, filter bson.M) error {
+func FindAll(collection string, results types.Document, filter bson.M) error {
 
 	coll := database.Client.Database(database.Database).Collection(collection)
 	cursor, err := coll.Find(context.TODO(), bson.D{})

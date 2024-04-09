@@ -6,11 +6,11 @@ import (
 )
 
 type User struct {
-	BaseModel
-	ID      string `json:"id" bson:"_id,omitempty"`
-	Name    string `json:"name" bson:"name,omitempty"`
-	Email   string `json:"email" bson:"email,omitempty"`
-	Picture string `json:"picture" bson:"picture,omitempty"`
+	BaseModel `bson:",inline"`
+	ID        string `json:"id" bson:"_id,omitempty"`
+	Name      string `json:"name" bson:"name,omitempty"`
+	Email     string `json:"email" bson:"email,omitempty"`
+	Picture   string `json:"picture" bson:"picture,omitempty"`
 	//Role     string `json:"role" bson:"role,omitempty"`
 	Password []byte `json:"-"`
 }
