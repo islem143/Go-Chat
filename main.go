@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	myerrors "github.com/islem143/go-chat/Errors"
 	"github.com/islem143/go-chat/database"
 	"github.com/islem143/go-chat/routes"
@@ -26,9 +27,10 @@ func main() {
 			return c.Status(code).JSON(message)
 		},
 	})
-	// app.Use(cors.New(cors.Config{
-	// 	AllowCredentials: true, //Very important while using a HTTPonly Cookie, frontend can easily get and return back the cookie.
-	// }))
+	app.Use(cors.New(cors.Config{
+		AllowOrigins:     "http://localhost:3000",
+		AllowCredentials: true, //Very important while using a HTTPonly Cookie, frontend can easily get and return back the cookie.
+	}))
 
 	routes.Setup(app) // A routes package/folder is created with 'Setup' function created.
 

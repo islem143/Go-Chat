@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/gofiber/fiber/v2/log"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -46,7 +47,7 @@ func NewApiError(status int, message string) *ApiError {
 	}
 }
 
-func ClientBodyError(message string) *ApiError {
+func ClientError(message string) *ApiError {
 	return NewApiError(422, message)
 }
 
@@ -67,4 +68,13 @@ func UnauthorizedError() *ApiError {
 
 func DocumentNotFoundError(err error) bool {
 	return err == mongo.ErrNoDocuments
+}
+
+func DbErrors(err error) error {
+	if err != mongo.ErrNoDocuments {
+		log.Error(err)
+		return InternalServerError("interal server error")
+	}
+
+	return NotFoundError("user not found")
 }

@@ -1,8 +1,15 @@
 package models
 
+import (
+	myerrors "github.com/islem143/go-chat/Errors"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
+
 type Message struct {
 	BaseModel  `bson:",inline"`
 	ReceiverId string `json:"receiver_id" bson:"receiver_id,omitempty"`
+	Read       bool   `json:"read" bson:"read,omitempty"`
 	UserId     string `json:"user_id" bson:"user_id,omitempty"`
 	Text       string `json:"text" bson:"text,omitempty"`
 }
@@ -11,13 +18,13 @@ func (user *Message) CollectionName() string {
 	return "messages"
 }
 
-func FindMessages(key string, value string) (*[]Message, error) {
-	//	filter := bson.M{key: value}
+func FindMessages(filter bson.D) (*[]Message, error) {
+
 	messages := &[]Message{}
-	err := FindAll("messages", messages, nil)
+	err := FindAll("messages", messages, filter)
 	if err != nil {
 
-		return nil, err
+		return nil, myerrors.DbErrors(err)
 	}
 	return messages, nil
 }
@@ -25,7 +32,23 @@ func InsertMessages(message *Message) error {
 	err := Insert(message.CollectionName(), message)
 	if err != nil {
 
-		return err
+		return myerrors.DbErrors(err)
+	}
+	return nil
+}
+
+func UpdateMessages(message *Message, feilds primitive.E) error {
+	objectId, err := primitive.ObjectIDFromHex(message.ID)
+	if err != nil {
+		return myerrors.DbErrors(err)
+	}
+
+	update := bson.D{{Key: "$set", Value: bson.D{feilds}}}
+	filter := bson.M{"_id": objectId}
+	err = Update(message.CollectionName(), filter, update)
+	if err != nil {
+
+		return myerrors.DbErrors(err)
 	}
 	return nil
 }

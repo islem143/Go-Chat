@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	apis "github.com/islem143/go-chat/api"
+	"github.com/islem143/go-chat/models"
 )
 
 type Message struct {
@@ -23,6 +24,8 @@ func Setup(app *fiber.App) {
 	api.Post("users/register", apis.Register)
 	//api.Use(middlewares.IsAuth)
 	api.Get("users/", apis.List)
+	api.Get("contacts/", apis.ContactList)
+	api.Post("contacts/", apis.AddContact)
 	api.Get("users/:id", apis.One)
 	api.Post("users/logout", apis.Logout)
 	//api.Use(middlewares.HasRole(types.ADMIN))
@@ -30,6 +33,7 @@ func Setup(app *fiber.App) {
 	messages := app.Group("/messages")
 	messages.Get("/", apis.GetMessages)
 	messages.Post("/", apis.InsertMessage)
+
 	messages.Use("/ws", func(c *fiber.Ctx) error {
 		// IsWebSocketUpgrade returns true if the client
 		// requested upgrade to the WebSocket protocol.
@@ -40,14 +44,22 @@ func Setup(app *fiber.App) {
 		}
 		return fiber.ErrUpgradeRequired
 	})
-	app.Get("/ws/:id", websocket.New(func(c *websocket.Conn) {
-		//id := c.Params("id")
-		//authUser := c.Locals("user").(*models.User)
-		pool.Clients["123"] = &Client{id: "123", conn: c}
-		// if authUser.ID != id {
-		// 	c.WriteJSON(&Message{Message: "unauthorized"})
-		// 	return
+	app.Get("/ws/private-chat/:id", websocket.New(func(c *websocket.Conn) {
+		id := c.Params("id")
+		if id == "" {
+			return
+		}
+		authUser := c.Locals("user").(*models.User)
+		if authUser.ID != id {
+			return
+		}
+
+		// _, ok := pool.Clients[authUser.ID]
+		// if !ok {
+		// 	pool.Clients[authUser.ID] = &Client{conn: c}
 		// }
+		pool.Clients["123"] = &Client{id: "123", conn: c}
+
 		var (
 			err error
 		)
@@ -60,16 +72,26 @@ func Setup(app *fiber.App) {
 
 			fmt.Println("Received message:", message.Message)
 			fmt.Println("Receiver", message.ReceiverId)
-			msg := &Message{
-
-				Message:    message.Message,
+			msg := models.Message{
 				ReceiverId: message.ReceiverId,
+				Text:       message.Message,
+				UserId:     authUser.ID,
+				Read:       false,
 			}
-			_, ok := pool.Clients[msg.ReceiverId]
+			err := models.InsertMessages(&msg)
+			if err != nil {
+				return
+			}
+
+			_, ok := pool.Clients[message.ReceiverId]
+
 			if !ok {
-				
+				// store the message in notification.
+				continue
+			} else {
+
+				pool.Messages <- &msg
 			}
-			pool.Messages <- msg
 		}
 
 	}))

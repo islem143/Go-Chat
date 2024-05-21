@@ -5,12 +5,12 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
+	"go.mongodb.org/mongo-driver/bson"
 
 	"github.com/golang-jwt/jwt/v5"
 	myerrors "github.com/islem143/go-chat/Errors"
 	"github.com/islem143/go-chat/models"
 	"github.com/islem143/go-chat/validation"
-	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -21,25 +21,22 @@ func Register(c *fiber.Ctx) error {
 	if err := c.BodyParser(&data); err != nil {
 		return err
 	}
-
-	valError := validation.ValidateRequset(validation.RegisterRequestValidator{
+	err := validation.Validate(validation.RegisterRequestValidator{
 		Name:  data["name"],
 		Email: data["email"],
 	})
-	if valError != nil {
-		log.Error(valError)
-
-		return myerrors.ClientBodyError(valError.Message)
+	if err != nil {
+		return err
 	}
-	dbuser, err := models.FindUser("email", data["email"])
 
-	if err != nil && err != mongo.ErrNoDocuments {
-		log.Error(err)
-		return myerrors.InternalServerError("interal server error")
+	user, err := models.FindUser("email", data["email"])
+
+	if err != nil && user != nil {
+
+		return err
 	}
-	if dbuser != nil {
-
-		return myerrors.RecordExistsError("Email")
+	if user != nil {
+		return myerrors.ClientError("email already exsists")
 	}
 
 	password, err := bcrypt.GenerateFromPassword([]byte(data["password"]), 6)
@@ -48,7 +45,7 @@ func Register(c *fiber.Ctx) error {
 		return myerrors.InternalServerError("interal server error")
 
 	}
-	user := &models.User{
+	user = &models.User{
 		Name:     data["name"],
 		Email:    data["email"],
 		Password: password,
@@ -62,17 +59,14 @@ func Register(c *fiber.Ctx) error {
 	return c.JSON(user)
 
 }
-func List(c *fiber.Ctx) error {
-	users, err := models.FindAllUsers()
-	if err == mongo.ErrNoDocuments {
-		return myerrors.NotFoundError("document not Found")
 
-	}
+func List(c *fiber.Ctx) error {
+	//authUser := c.Locals("user").(*models.User)
+
+	users, err := models.FindAllUsers(bson.D{})
 	if err != nil {
 		return err
-
 	}
-
 	return c.JSON(ApiResponseList{List: users})
 }
 
@@ -88,14 +82,8 @@ func One(c *fiber.Ctx) error {
 		return err
 	}
 	user, err := models.FindUserById(id)
-
-	if err == mongo.ErrNoDocuments {
-		return myerrors.NotFoundError("document not Found")
-
-	}
 	if err != nil {
 		return err
-
 	}
 	return c.JSON(user)
 }
@@ -108,34 +96,23 @@ func Login(c *fiber.Ctx) error {
 	if err := c.BodyParser(&data); err != nil {
 		return err
 	}
-
-	valError := validation.ValidateRequset(validation.LoginRequestValidator{
+	err := validation.Validate(validation.LoginRequestValidator{
 		Email:    data["email"],
 		Password: string(data["password"]),
 	})
-
-	if valError != nil {
-		log.Error(valError)
-		return myerrors.ClientBodyError(valError.Message)
+	if err != nil {
+		return err
 	}
 
 	user, err := models.FindUser("email", data["email"])
-	if err != nil && err != mongo.ErrNoDocuments {
-		log.Error(err)
-		return myerrors.InternalServerError("interal server error")
-	}
-	if user == nil {
-
-		return myerrors.NotFoundError("user not found")
+	if err != nil {
+		return err
 	}
 
 	err = bcrypt.CompareHashAndPassword(user.Password, []byte(data["password"]))
 	if err != nil {
-		log.Error(err)
-		c.Status(fiber.StatusBadRequest)
-		return c.JSON(fiber.Map{
-			"message": "incorrect password",
-		})
+		return myerrors.UnauthorizedError()
+
 	}
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
 		Issuer:    user.ID,                                            //issuer contains the ID of the user.
@@ -144,10 +121,8 @@ func Login(c *fiber.Ctx) error {
 	token, errf := claims.SignedString([]byte(SecretKey))
 
 	if errf != nil {
-		c.Status(fiber.StatusInternalServerError)
-		return c.JSON(fiber.Map{
-			"message": "could not login",
-		})
+		return myerrors.ClientError("could not login")
+
 	}
 	cookie := fiber.Cookie{
 		Name:     "jwt",
@@ -160,6 +135,7 @@ func Login(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{
 		"message": "success",
+		"user":    user,
 	})
 
 }
@@ -174,8 +150,6 @@ func Logout(c *fiber.Ctx) error {
 
 	c.Cookie(&cookie)
 
-	return c.JSON(fiber.Map{
-		"message": "success",
-	})
+	return c.JSON(ApiResponse{Message: "logged out successfuly."})
 
 }

@@ -8,13 +8,15 @@ import (
 	"github.com/islem143/go-chat/database"
 	"github.com/islem143/go-chat/types"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func FindAll(collection string, results types.Document, filter bson.M) error {
+func FindAll(collection string, results types.Document, filter bson.D) error {
 
 	coll := database.Client.Database(database.Database).Collection(collection)
-	cursor, err := coll.Find(context.TODO(), bson.D{})
+	cursor, err := coll.Find(context.TODO(), filter)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			results = nil
@@ -59,6 +61,16 @@ func Insert(collection string, model Model) error {
 	if err != nil {
 		log.Error(err)
 		return &myerrors.MyError{Code: 500, Message: "internal server error"}
+	}
+	return nil
+}
+func Update(collection string, filter bson.M, update primitive.D) error {
+	opts := options.Update().SetUpsert(true)
+	coll := database.Client.Database(database.Database).Collection(collection)
+
+	_, err := coll.UpdateOne(context.TODO(), filter, update, opts)
+	if err != nil {
+		return err
 	}
 	return nil
 }

@@ -33,14 +33,21 @@ const colorMode = useColorMode()
           href="#"
           class="text-foreground transition-colors hover:text-foreground"
         >
-        <NuxtLink to="/">Dashboard</NuxtLink>
+        <NuxtLink to="/">Chat</NuxtLink>
         </a>
         <a
+          href="#"
+          class="text-foreground transition-colors hover:text-foreground"
+        >
+        <NuxtLink to="/login">Login</NuxtLink>
+        </a>
+      
+        <!-- <a
           href="#"
           class="text-muted-foreground transition-colors hover:text-foreground"
         >
         <NuxtLink to="/transactions">Chat</NuxtLink>
-        </a>
+        </a> -->
        
       </nav>
       <Sheet>

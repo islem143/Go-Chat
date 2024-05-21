@@ -2,19 +2,25 @@ package api
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/log"
-	myerrors "github.com/islem143/go-chat/Errors"
 	"github.com/islem143/go-chat/models"
 	"github.com/islem143/go-chat/validation"
-	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
-func GetMessages(c *fiber.Ctx) error {
-	messages, err := models.FindMessages("user_id", "4")
-	if err == mongo.ErrNoDocuments {
-		return myerrors.NotFoundError("document not Found")
+type GetMessageRequsetBody struct {
+	ReceiverId string `json:"receiver_id"`
+	UserId     string `json:"user_id"` // This could be any type
+}
 
+func GetMessages(c *fiber.Ctx) error {
+	var requestBody GetMessageRequsetBody
+	if err := c.BodyParser(&requestBody); err != nil {
+
+		return err
 	}
+	filter := bson.D{{Key: "user_id", Value: requestBody.UserId}, {Key: "receiver_id", Value: requestBody.ReceiverId}}
+	messages, err := models.FindMessages(filter)
+
 	if err != nil {
 		return err
 
@@ -29,22 +35,21 @@ func InsertMessage(c *fiber.Ctx) error {
 	if err := c.BodyParser(&data); err != nil {
 		return err
 	}
-	valError := validation.ValidateRequset(validation.MessageRequestValidator{
+
+	valError := validation.Validate(validation.MessageRequestValidator{
 		Message:    data["message"],
 		ReceiverId: data["receiver_id"],
 	})
 
 	if valError != nil {
-		log.Error(valError)
-		return myerrors.ClientBodyError(valError.Message)
+
+		return valError
 	}
 	_, err := models.FindUserById(data["receiver_id"])
 
-	if myerrors.DocumentNotFoundError(err) {
-		return myerrors.NotFoundError("user not found")
-	} else if err != nil {
-		log.Error(err)
-		return myerrors.InternalServerError("internal server error")
+	if err != nil {
+
+		return err
 	}
 
 	authUser := c.Locals("user").(*models.User)
@@ -52,8 +57,7 @@ func InsertMessage(c *fiber.Ctx) error {
 
 	err = models.InsertMessages(message)
 	if err != nil {
-
-		return myerrors.InternalServerError("interal server error")
+		return err
 	}
 	return c.JSON(message)
 }

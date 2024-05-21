@@ -6,6 +6,8 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
+	myerrors "github.com/islem143/go-chat/Errors"
 )
 
 type (
@@ -78,6 +80,15 @@ func ValidateRequset(val interface{}) *fiber.Error {
 			Code:    fiber.ErrBadRequest.Code,
 			Message: strings.Join(errMsgs, " and "),
 		}
+	}
+	return nil
+}
+func Validate(validator any) error {
+	valError := ValidateRequset(validator)
+	if valError != nil {
+		log.Error(valError)
+
+		return myerrors.ClientError(valError.Message)
 	}
 	return nil
 }
