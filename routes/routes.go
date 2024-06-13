@@ -7,12 +7,18 @@ import (
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	apis "github.com/islem143/go-chat/api"
+	"github.com/islem143/go-chat/middlewares"
 	"github.com/islem143/go-chat/models"
 )
 
 type Message struct {
 	Message    string `json:"message"`
 	ReceiverId string `json:"receiver"`
+	UserId     string `json:"user_id"`
+}
+
+type MessageLogin struct {
+	Login string `json:"login"`
 }
 
 func Setup(app *fiber.App) {
@@ -22,43 +28,62 @@ func Setup(app *fiber.App) {
 	api := app.Group("/")
 	api.Post("users/login", apis.Login)
 	api.Post("users/register", apis.Register)
-	//api.Use(middlewares.IsAuth)
+	api.Use(middlewares.IsAuth)
 	api.Get("users/", apis.List)
 	api.Get("contacts/", apis.ContactList)
 	api.Post("contacts/", apis.AddContact)
 	api.Get("users/:id", apis.One)
 	api.Post("users/logout", apis.Logout)
 	//api.Use(middlewares.HasRole(types.ADMIN))
-
-	messages := app.Group("/messages")
-	messages.Get("/", apis.GetMessages)
-	messages.Post("/", apis.InsertMessage)
-
-	messages.Use("/ws", func(c *fiber.Ctx) error {
-		// IsWebSocketUpgrade returns true if the client
+	app.Use("/ws", func(c *fiber.Ctx) error {
+		// IsWebocketUpgrade returns true if the client
 		// requested upgrade to the WebSocket protocol.
-		fmt.Println("ttt")
+
 		if websocket.IsWebSocketUpgrade(c) {
 			c.Locals("allowed", true)
 			return c.Next()
 		}
 		return fiber.ErrUpgradeRequired
 	})
+	// app.Get("/ws/connect", websocket.New(func(c *websocket.Conn) {
+
+	// 	msg := new(MessageLogin)
+	// 	for {
+	// 		if err := c.ReadJSON(msg); err != nil {
+	// 			log.Println("read:", err)
+	// 			c.Close()
+	// 		}
+	// 		fmt.Printf(msg.Login)
+
+	// 	}
+
+	// }))
 	app.Get("/ws/private-chat/:id", websocket.New(func(c *websocket.Conn) {
 		id := c.Params("id")
 		if id == "" {
 			return
 		}
 		authUser := c.Locals("user").(*models.User)
-		if authUser.ID != id {
-			return
+		fmt.Println(authUser, "auth")
+		// if authUser.ID != id {
+		// 	return
+		// }
+		_, ok := pool.Clients[authUser.ID]
+		if !ok {
+
+			pool.Clients[authUser.ID] = &Client{id: authUser.ID, conn: c}
 		}
+
+		defer func() {
+			delete(pool.Clients, authUser.ID)
+
+			c.Close()
+		}()
 
 		// _, ok := pool.Clients[authUser.ID]
 		// if !ok {
 		// 	pool.Clients[authUser.ID] = &Client{conn: c}
 		// }
-		pool.Clients["123"] = &Client{id: "123", conn: c}
 
 		var (
 			err error
@@ -69,13 +94,14 @@ func Setup(app *fiber.App) {
 				log.Println("read:", err)
 				break
 			}
+			if message.Message == "" {
 
-			fmt.Println("Received message:", message.Message)
-			fmt.Println("Receiver", message.ReceiverId)
+				continue
+			}
 			msg := models.Message{
 				ReceiverId: message.ReceiverId,
 				Text:       message.Message,
-				UserId:     authUser.ID,
+				UserId:     message.UserId,
 				Read:       false,
 			}
 			err := models.InsertMessages(&msg)
@@ -83,7 +109,7 @@ func Setup(app *fiber.App) {
 				return
 			}
 
-			_, ok := pool.Clients[message.ReceiverId]
+			_, ok = pool.Clients[message.ReceiverId]
 
 			if !ok {
 				// store the message in notification.
@@ -95,5 +121,8 @@ func Setup(app *fiber.App) {
 		}
 
 	}))
+	messages := app.Group("/messages")
+	messages.Get("/", apis.GetMessages)
+	messages.Post("/", apis.InsertMessage)
 
 }

@@ -21,7 +21,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-import { h } from "vue";
+import { h,ref } from "vue";
 import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
@@ -30,31 +30,41 @@ import { Toaster } from "@/components/ui/toast";
 import { useAuth } from "~/store/auth";
 
 const auth = useAuth();
-const formData = reactive({
-  email: "",
-  password: "",
-});
-const formSchema = toTypedSchema(
-  z.object({
-    email: z.string().nonempty("This is required").email(),
-    password: z.string().nonempty("This is required").min(5),
-  })
-);
-const { handleSubmit } = useForm({
-  validationSchema: formSchema,
-});
+const email = ref('')
+const password = ref('')
+watch(email,(val)=>{
+  console.log(val,"----");
+  
+})
+// const formSchema = toTypedSchema(
+//   z.object({
+//     email: z.string().nonempty("This is required").email(),
+//     password: z.string().nonempty("This is required").min(5),
+//   })
+// );
+// const { handleSubmit } = useForm({
+//   validationSchema: formSchema,
+// });
 const loading = useLoading();
 
-const login = handleSubmit((values) => {
+
+const login = ()=>{
+  console.log("email");
+  
   auth
     .login({
-      email: formData.email,
-      password: formData.password,
+      email: email.value,
+      password: password.value,
     })
     .then(() => {
       navigateTo("/");
     });
-});
+}
+
+
+
+
+
 </script>
 
 <template>
@@ -72,8 +82,8 @@ const login = handleSubmit((values) => {
             <FormItem>
               <FormLabel>email</FormLabel>
               <FormControl>
-                <Input
-                  v-model="formData.email"
+                <input
+                  v-model="email"
                   type="text"
                   placeholder="email"
                   v-bind="componentField"
@@ -89,8 +99,8 @@ const login = handleSubmit((values) => {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input
-                  v-model="formData.password"
+                <input
+                  v-model="password"
                   type="password"
                   placeholder="password"
                   v-bind="componentField"

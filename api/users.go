@@ -133,11 +133,14 @@ func Login(c *fiber.Ctx) error {
 
 	c.Cookie(&cookie)
 
+	// return c.JSON(fiber.Map{
+	// 	"message": "success",
+	// 	"user":    user,
+	// 	"token":   token,
+	// })
 	return c.JSON(fiber.Map{
 		"message": "success",
-		"user":    user,
 	})
-
 }
 
 func Logout(c *fiber.Ctx) error {

@@ -5,6 +5,7 @@ import (
 	"github.com/islem143/go-chat/models"
 	"github.com/islem143/go-chat/validation"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type GetMessageRequsetBody struct {
@@ -13,13 +14,22 @@ type GetMessageRequsetBody struct {
 }
 
 func GetMessages(c *fiber.Ctx) error {
-	var requestBody GetMessageRequsetBody
-	if err := c.BodyParser(&requestBody); err != nil {
 
-		return err
+	m := c.Queries()
+
+	opts := options.Find().SetSort(bson.D{{Key: "created_Value: at", Value: -1}})
+	authUser := c.Locals("user").(*models.User)
+
+	filter := bson.D{{
+		Key: "$or", Value: bson.A{
+			bson.D{{Key: "user_id", Value: authUser.ID}},
+			bson.D{{Key: "user_id", Value: m["receiver_id"]}},
+			bson.D{{Key: "receiver_id", Value: m["receiver_id"]}},
+			bson.D{{Key: "receiver_id", Value: authUser.ID}},
+		},
+	},
 	}
-	filter := bson.D{{Key: "user_id", Value: requestBody.UserId}, {Key: "receiver_id", Value: requestBody.ReceiverId}}
-	messages, err := models.FindMessages(filter)
+	messages, err := models.FindMessages(filter, opts)
 
 	if err != nil {
 		return err

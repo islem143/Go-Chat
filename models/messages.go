@@ -4,6 +4,7 @@ import (
 	myerrors "github.com/islem143/go-chat/Errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Message struct {
@@ -18,10 +19,10 @@ func (user *Message) CollectionName() string {
 	return "messages"
 }
 
-func FindMessages(filter bson.D) (*[]Message, error) {
+func FindMessages(filter bson.D, opts *options.FindOptions) (*[]Message, error) {
 
 	messages := &[]Message{}
-	err := FindAll("messages", messages, filter)
+	err := FindAll("messages", messages, filter, opts)
 	if err != nil {
 
 		return nil, myerrors.DbErrors(err)

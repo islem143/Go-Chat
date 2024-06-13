@@ -2,7 +2,7 @@ import { useToast } from "@/components/ui/toast/use-toast";
 import type { Actions } from "~/constants/actions";
 import { useLoading } from "~/store/loading";
 
-export const useMyFetch = async (url:string, opts:object, type:Actions) => {
+export const useMyFetch = async (url: string, opts: object, type: Actions) => {
   const config = useRuntimeConfig();
   const { toast } = useToast();
   const loading = useLoading();
@@ -10,6 +10,9 @@ export const useMyFetch = async (url:string, opts:object, type:Actions) => {
   const { pending, data, error, status } = await useFetch(url, {
     baseURL: config.public.baseURL,
     credentials: 'include',
+    // headers: {
+    //   Authorization: "Bearer " + localStorage.getItem("token")
+    // },
     ...opts,
   });
   loading.loading[type] = false;

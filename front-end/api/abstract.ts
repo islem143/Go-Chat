@@ -1,7 +1,7 @@
 import type { Actions } from "~/constants/actions";
 
 export default class Abstract {
-    static async get(url:string,type:Actions){
+    static async get(url: string, type: Actions, query: any) {
         try {
             const config = useRuntimeConfig();
 
@@ -9,16 +9,17 @@ export default class Abstract {
                 baseURL: config.public.baseURL,
 
                 method: "GET",
-               
+                query: query
 
-            },type)
-           
-            
-            if(error){
+
+            }, type)
+
+
+            if (error) {
                 throw error;
             }
             return data
-            
+
 
 
 
@@ -26,7 +27,7 @@ export default class Abstract {
             throw err;
         }
     }
-    static async post(url: string, body: any,type:Actions) {
+    static async post(url: string, body: any, type: Actions) {
 
         try {
             const config = useRuntimeConfig();
@@ -37,14 +38,14 @@ export default class Abstract {
                 method: "POST",
                 body: body
 
-            },type)
-           
-            
-            if(error){
+            }, type)
+
+
+            if (error) {
                 throw error;
             }
             return data
-            
+
 
 
 

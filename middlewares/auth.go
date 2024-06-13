@@ -12,30 +12,37 @@ const SecretKey = "secret"
 
 func IsAuth(c *fiber.Ctx) error {
 	cookie := c.Cookies("jwt")
+	//auth := c.Get("Authorization")
+	if cookie != "" {
+		//res := strings.Split(auth, " ")[1]
 
-	token, err := jwt.ParseWithClaims(cookie, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(SecretKey), nil //using the SecretKey which was generated in th Login function
-	})
+		token, err := jwt.ParseWithClaims(cookie, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
+			return []byte(SecretKey), nil //using the SecretKey which was generated in th Login function
+		})
 
-	if err != nil {
-		log.Error(err)
-		return myerrors.UnauthorizedError()
-	}
+		if err != nil {
+			log.Error(err)
 
-	claims, ok := token.Claims.(*jwt.RegisteredClaims)
-
-	if ok {
-		user, err := models.FindUserById(claims.Issuer)
-		log.Error(err)
-
-		if myerrors.DocumentNotFoundError(err) {
-			return myerrors.NotFoundError("user not found")
-		} else if err != nil {
-
-			return myerrors.InternalServerError("internal server error")
+			return myerrors.UnauthorizedError()
 		}
 
-		c.Locals("user", user)
+		claims, ok := token.Claims.(*jwt.RegisteredClaims)
+
+		if ok {
+			user, err := models.FindUserById(claims.Issuer)
+			if err != nil {
+				log.Error(err)
+			}
+
+			if myerrors.DocumentNotFoundError(err) {
+				return myerrors.NotFoundError("user not found")
+			} else if err != nil {
+
+				return myerrors.InternalServerError("internal server error")
+			}
+
+			c.Locals("user", user)
+		}
 	}
 
 	return c.Next()

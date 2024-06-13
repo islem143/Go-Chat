@@ -81,8 +81,13 @@ function onExpand() {
   isCollapsed.value = false
 }
 
+const selectedUser=ref("");
+
 const users=await Users.getContacts();
-console.log(users);
+import { useAuth } from "~/store/auth";
+
+const auth = useAuth();
+console.log(auth);
 
 
 </script>
@@ -102,6 +107,7 @@ console.log(users);
               Contact List
             </h1>
             <TabsList class="ml-auto">
+            
               <TabsTrigger value="all" class="text-zinc-600 dark:text-zinc-200">
                 All 
               </TabsTrigger>
@@ -120,7 +126,7 @@ console.log(users);
             </form>
           </div>
           <TabsContent value="all" class="m-0">
-            <ContactList :users="users"  :items="filteredMailList" />
+            <ContactList :users="users"  v-model:selected-user="selectedUser" :items="filteredMailList" />
           </TabsContent>
           <!-- <TabsContent value="unread" class="m-0">
             <ContactList :users="users" v-model:selected-mail="selectedMail" :items="unreadMailList" />
@@ -129,7 +135,7 @@ console.log(users);
       </ResizablePanel>
       <ResizableHandle id="resiz-handle-2" with-handle />
       <ResizablePanel id="resize-panel-3" :default-size="defaultLayout[2]">
-        <ChatDisplay  />
+        <ChatDisplay :selectedUser="selectedUser" />
       </ResizablePanel>
     </ResizablePanelGroup>
   </TooltipProvider>

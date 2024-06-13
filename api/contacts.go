@@ -46,8 +46,8 @@ func AddContact(c *fiber.Ctx) error {
 }
 
 func ContactList(c *fiber.Ctx) error {
-	//authUser := c.Locals("user").(*models.User)
-	res, err := primitive.ObjectIDFromHex("6647d0bfa347f75b4f7d3ee2")
+	authUser := c.Locals("user").(*models.User)
+	res, err := primitive.ObjectIDFromHex(authUser.ID)
 	if err != nil {
 		return myerrors.DbErrors(err)
 	}

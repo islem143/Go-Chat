@@ -3,7 +3,6 @@ package routes
 import (
 	"github.com/gofiber/contrib/websocket"
 	"github.com/islem143/go-chat/models"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Client struct {
@@ -33,8 +32,8 @@ func (p *Pool) Start() {
 
 		val, ok := p.Clients[recevierId]
 		if ok {
-			f := primitive.E{Key: "read", Value: true}
-			models.UpdateMessages(msg, f)
+			//f := primitive.E{Key: "read", Value: true}
+			//models.UpdateMessages(msg, f)
 			val.conn.WriteJSON((msg.Text))
 
 		}

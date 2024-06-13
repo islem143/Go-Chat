@@ -13,10 +13,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func FindAll(collection string, results types.Document, filter bson.D) error {
+func FindAll(collection string, results types.Document, filter bson.D, opts *options.FindOptions) error {
 
 	coll := database.Client.Database(database.Database).Collection(collection)
-	cursor, err := coll.Find(context.TODO(), filter)
+	cursor, err := coll.Find(context.TODO(), filter, opts)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			results = nil

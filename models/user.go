@@ -51,7 +51,7 @@ func FindAllUsers(filter bson.D) (*[]User, error) {
 
 	users := &[]User{}
 
-	err := FindAll("users", users, filter)
+	err := FindAll("users", users, filter, nil)
 	if err != nil {
 		return nil, myerrors.DbErrors(err)
 

@@ -1,30 +1,20 @@
 <script lang="ts" setup>
 import { formatDistanceToNow } from "date-fns";
 import type { User } from "~/types";
-
+import { Message } from "~/api/Message";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
 interface UsersList {
-
   users: User[];
 }
 
-const props=defineProps<UsersList>();
+const props = defineProps<UsersList>();
+
+const selectedUser = defineModel<string>("selectedUser", { required: true });
 
 
-
-
-const selectedMail = defineModel<string>("selectedMail", { required: false });
-
-function getBadgeVariantFromLabel(label: string) {
-  if (["work"].includes(label.toLowerCase())) return "default";
-
-  if (["personal"].includes(label.toLowerCase())) return "outline";
-
-  return "secondary";
-}
 </script>
 
 <template>
@@ -37,10 +27,10 @@ function getBadgeVariantFromLabel(label: string) {
           :class="
             cn(
               'flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent',
-              selectedMail === item.id && 'bg-muted'
+              selectedUser === item.id && 'bg-muted'
             )
           "
-          @click="selectedMail = item.id"
+          @click="selectedUser = item"
         >
           <div class="flex w-full flex-col gap-1">
             <!-- <Avatar>
@@ -61,7 +51,7 @@ function getBadgeVariantFromLabel(label: string) {
                 :class="
                   cn(
                     'ml-auto text-xs',
-                    selectedMail === item.id
+                    selectedUser === item.id
                       ? 'text-foreground'
                       : 'text-muted-foreground'
                   )
@@ -108,4 +98,3 @@ function getBadgeVariantFromLabel(label: string) {
   position: absolute;
 }
 </style>
-

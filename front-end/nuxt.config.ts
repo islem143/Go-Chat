@@ -1,6 +1,6 @@
 export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt','@pinia/nuxt', '@nuxtjs/color-mode',"nuxt-icon","@vee-validate/nuxt"],
-  ssr: false,
+ssr:false,
   runtimeConfig: {
     public: {
       baseURL: process.env.BASE_URL || 'http://localhost:8000',

@@ -16,10 +16,11 @@ export const useAuth = defineStore('auth', {
   actions: {
 
     login(body) {
-      
+
       return Auth.login(body).then(res => {
 
         this.user = res.user;
+        localStorage.setItem("token", res.token);
 
 
       })

@@ -43,8 +43,6 @@ interface MailDisplayProps {
   mail: Mail | undefined;
 }
 
-const props = defineProps<MailDisplayProps>();
-
 const mailFallbackName = computed(() => {
   return props.mail?.name
     .split(" ")
@@ -89,77 +87,65 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { Message } from "~/api/Message";
 
 const input = ref("");
 const inputLength = computed(() => input.value.trim().length);
+
+let socket = new WebSocket("ws://localhost:8000/ws/private-chat/4");
+socket.addEventListener("open", (event) => {
+  console.log("connection oppend");
+  let msg = {
+    user_id:
+      props.selectedUser.name == "ilyes"
+        ? "664f842a19d94fd5534d2eac"
+        : "664f842019d94fd5534d2eab",
+  };
+  socket.send(JSON.stringify(msg));
+});
+const props = defineProps(["selectedUser"]);
+
 const sendMessage = () => {
   messages.value.push({
     role: "user",
     content: input.value,
   });
+  console.log(props.selectedUser.id, "sdddddd");
+
+  let msg = {
+    user_id:
+      props.selectedUser.name == "ilyes"
+        ? "664f842019d94fd5534d2eab"
+        : "664f842a19d94fd5534d2eac",
+    message: input.value,
+    receiver: props.selectedUser.id,
+  };
+  socket.send(JSON.stringify(msg));
   input.value = "";
 };
-// onMounted(() => {
-//   let socket = new WebSocket("ws://localhost:8000/ws/private-chat/4");
-//   socket.addEventListener("open", (event) => {
-//     console.log("connection oppend");
-//   });
-//   socket.send("qsd");
-//   socket.onmessage = (msg) => {
-//     console.log("messags", msg);
-//   };
-// });
-// const users = ref([
-//   {
-//     name: "Olivia Martin",
-//     email: "m@example.com",
-//     avatar: "/avatars/01.png",
-//   },
-//   {
-//     name: "Isabella Nguyen",
-//     email: "isabella.nguyen@email.com",
-//     avatar: "/avatars/03.png",
-//   },
-//   {
-//     name: "Emma Wilson",
-//     email: "emma@example.com",
-//     avatar: "/avatars/05.png",
-//   },
-//   {
-//     name: "Jackson Lee",
-//     email: "lee@example.com",
-//     avatar: "/avatars/02.png",
-//   },
-//   {
-//     name: "William Kim",
-//     email: "will@email.com",
-//     avatar: "/avatars/04.png",
-//   },
-// ]);
+
+socket.onmessage = (msg) => {
+  console.log("get Message***********");
+  messages.value.push({ role: "is", content: JSON.parse(msg.data) });
+  //console.log(r);
+
+  //messages.value.push({role:"ss",content})
+};
+
+
 let users = ref<any>([]);
 let messages = ref<any>([]);
 
-// const getUsers = async () => {
-//   const res: ApiResponseList = await $fetch("/users", {
-//     baseURL: "http://localhost:8000",
-//     method: "GET",
-//   });
-
-//   users.value = res.list;
-// };
-// const getMessages = async () => {
-//   const res: ApiResponseList = await $fetch("/messages", {
-//     baseURL: "http://localhost:8000",
-//     method: "GET",
-//   });
-//   let list = res.list;
-
-//   messages.value = res.list;
-// };
-// getUsers();
-// getMessages();
 type User = (typeof users.value)[number];
+watch(props,async (val)=>{
 
+  let res=await Message.getChatMessages({receiverId:props.selectedUser.id});
+  res=res.map(p=>({"content":p.text,role:"qsd"}));
+
+  
+ messages.value=res;
+  
+})
 const open = ref(false);
 const selectedUsers = ref<User[]>([]);
 </script>
@@ -290,7 +276,7 @@ const selectedUsers = ref<User[]>([]);
       </DropdownMenu>
     </div>
     <Separator />
-    <Card>
+    <Card class="overflow-scroll overflow-x-hidden">
       <CardHeader class="flex flex-row items-center justify-between">
         <div class="flex items-center space-x-4">
           <Avatar>
@@ -318,7 +304,8 @@ const selectedUsers = ref<User[]>([]);
         </TooltipProvider>
       </CardHeader>
       <CardContent>
-        <div class="space-y-4">
+        <div class="space-y-4 ">
+
           <div
             v-for="(message, index) in messages"
             :key="index"
@@ -331,7 +318,7 @@ const selectedUsers = ref<User[]>([]);
               )
             "
           >
-            {{ message.Text }}
+            {{ message.content }}
           </div>
         </div>
       </CardContent>
