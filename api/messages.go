@@ -1,6 +1,8 @@
 package api
 
 import (
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/islem143/go-chat/models"
 	"github.com/islem143/go-chat/validation"
@@ -19,13 +21,13 @@ func GetMessages(c *fiber.Ctx) error {
 
 	opts := options.Find().SetSort(bson.D{{Key: "created_Value: at", Value: -1}})
 	authUser := c.Locals("user").(*models.User)
-
+	fmt.Println(authUser.ID)
+	//      bson.D{{Key: "user_id", Value: authUser.ID}},
+	// 		bson.D{{Key: "user_id", Value: m["receiver_id"]}}
 	filter := bson.D{{
 		Key: "$or", Value: bson.A{
-			bson.D{{Key: "user_id", Value: authUser.ID}},
-			bson.D{{Key: "user_id", Value: m["receiver_id"]}},
-			bson.D{{Key: "receiver_id", Value: m["receiver_id"]}},
-			bson.D{{Key: "receiver_id", Value: authUser.ID}},
+			bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "user_id", Value: authUser.ID}}, bson.D{{Key: "receiver_id", Value: m["receiver_id"]}}}}},
+			bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "user_id", Value: m["receiver_id"]}}, bson.D{{Key: "receiver_id", Value: authUser.ID}}}}},
 		},
 	},
 	}
@@ -64,7 +66,7 @@ func InsertMessage(c *fiber.Ctx) error {
 
 	authUser := c.Locals("user").(*models.User)
 	message := models.NewMessage(authUser.ID, data["receiver_id"], data["message"])
-
+	fmt.Println(message)
 	err = models.InsertMessages(message)
 	if err != nil {
 		return err

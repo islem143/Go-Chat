@@ -101,7 +101,7 @@ func Setup(app *fiber.App) {
 			msg := models.Message{
 				ReceiverId: message.ReceiverId,
 				Text:       message.Message,
-				UserId:     message.UserId,
+				UserId:     authUser.ID,
 				Read:       false,
 			}
 			err := models.InsertMessages(&msg)
