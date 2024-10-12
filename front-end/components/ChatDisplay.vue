@@ -94,14 +94,7 @@ const inputLength = computed(() => input.value.trim().length);
 
 let socket = new WebSocket("ws://localhost:8000/ws/private-chat/4");
 socket.addEventListener("open", (event) => {
-  console.log("connection oppend");
-  let msg = {
-    user_id:
-      props.selectedUser.name == "ilyes"
-        ? "664f842a19d94fd5534d2eac"
-        : "664f842019d94fd5534d2eab",
-  };
-  socket.send(JSON.stringify(msg));
+
 });
 const props = defineProps(["selectedUser"]);
 
@@ -110,48 +103,49 @@ const sendMessage = () => {
     role: "user",
     content: input.value,
   });
-  console.log(props.selectedUser.id, "sdddddd");
+
 
   let msg = {
-    user_id:
-      props.selectedUser.name == "ilyes"
-        ? "664f842019d94fd5534d2eab"
-        : "664f842a19d94fd5534d2eac",
+
     message: input.value,
     receiver: props.selectedUser.id,
+
   };
   socket.send(JSON.stringify(msg));
   input.value = "";
 };
 
 socket.onmessage = (msg) => {
-  console.log("get Message***********");
-  messages.value.push({ role: "is", content: JSON.parse(msg.data) });
-  //console.log(r);
 
-  //messages.value.push({role:"ss",content})
+  messages.value.push({ role: "other", content: JSON.parse(msg.data) });
+
 };
 
+const getMessages = async () => {
+  let res = await Message.getChatMessages({ receiverId: props.selectedUser.id });
 
+
+  res = res.map(p => ({ "content": p.text, role: "qsd", role: props.selectedUser.id == p.receiver_id ? 'user' : 'other' }));
+
+
+  messages.value = res;
+};
 let users = ref<any>([]);
 let messages = ref<any>([]);
 
 type User = (typeof users.value)[number];
-watch(props,async (val)=>{
+watch(props, async (val) => {
+  getMessages();
 
-  let res=await Message.getChatMessages({receiverId:props.selectedUser.id});
-  res=res.map(p=>({"content":p.text,role:"qsd"}));
 
-  
- messages.value=res;
-  
 })
+getMessages();
 const open = ref(false);
 const selectedUsers = ref<User[]>([]);
 </script>
 
 <template>
-  <div class="flex h-full flex-col">
+  <div class="flex h-full flex-col ">
     <div class="flex items-center p-2">
       <div class="flex items-center gap-2">
         <Tooltip>
@@ -284,58 +278,40 @@ const selectedUsers = ref<User[]>([]);
             <AvatarFallback>OM</AvatarFallback>
           </Avatar>
           <div>
-            <p class="text-sm font-medium leading-none">Sofia Davis</p>
-            <p class="text-sm text-muted-foreground">m@example.com</p>
+            <p class="text-sm font-medium leading-none">{{ selectedUser.name }}</p>
+
           </div>
         </div>
-        <TooltipProvider>
+        <!-- <TooltipProvider>
           <Tooltip :delay-duration="200">
             <TooltipTrigger as-child>
-              <Button
-                variant="outline"
-                class="rounded-full p-2.5 flex items-center justify-center"
-                @click="open = true"
-              >
+              <Button variant="outline" class="rounded-full p-2.5 flex items-center justify-center"
+                @click="open = true">
                 <Plus class="w-4 h-4" />
               </Button>
             </TooltipTrigger>
             <TooltipContent :side-offset="10"> New message </TooltipContent>
           </Tooltip>
-        </TooltipProvider>
+        </TooltipProvider> -->
       </CardHeader>
       <CardContent>
         <div class="space-y-4 ">
 
-          <div
-            v-for="(message, index) in messages"
-            :key="index"
-            :class="
-              cn(
-                'flex w-max max-w-[75%] flex-col gap-2 rounded-lg px-3 py-2 text-sm',
-                message.role === 'user'
-                  ? 'ml-auto bg-primary text-primary-foreground'
-                  : 'bg-muted'
-              )
-            "
-          >
+          <div v-for="(message, index) in messages" :key="index" :class="cn(
+            'flex w-max max-w-[75%] flex-col gap-2 rounded-lg px-3 py-2 text-sm',
+            message.role === 'user'
+              ? 'ml-auto bg-primary text-primary-foreground'
+              : 'bg-muted'
+          )
+            ">
             {{ message.content }}
           </div>
         </div>
       </CardContent>
       <CardFooter>
-        <form
-          class="flex w-full items-center space-x-2"
-          @submit.prevent="sendMessage"
-        >
-          <Input
-            v-model="input"
-            placeholder="Type a message..."
-            class="flex-1"
-          />
-          <Button
-            class="p-2.5 flex items-center justify-center"
-            :disabled="inputLength === 0"
-          >
+        <form class="flex w-full items-center space-x-2" @submit.prevent="sendMessage">
+          <Input v-model="input" placeholder="Type a message..." class="flex-1" />
+          <Button class="p-2.5 flex items-center justify-center" :disabled="inputLength === 0">
             <Send class="w-4 h-4" />
             <span class="sr-only">Send</span>
           </Button>
@@ -351,30 +327,21 @@ const selectedUsers = ref<User[]>([]);
             Invite a user to this thread. This will create a new group message.
           </DialogDescription>
         </DialogHeader>
-        <Command
-          class="overflow-hidden rounded-t-none border-t"
-          :filter-function="(list: User[], search) => list.filter(l => l.name.toLowerCase().includes(search.toLowerCase()))"
-        >
+        <Command class="overflow-hidden rounded-t-none border-t"
+          :filter-function="(list: User[], search) => list.filter(l => l.name.toLowerCase().includes(search.toLowerCase()))">
           <CommandInput placeholder="Search user..." />
           <CommandList>
             <CommandEmpty>No users found.</CommandEmpty>
             <CommandGroup class="p-2">
-              <CommandItem
-                v-for="user in users"
-                :key="user.email"
-                :value="user"
-                class="flex items-center px-2"
-                @select="
-                  () => {
-                    const index = selectedUsers.findIndex((u) => u === user);
-                    if (index !== -1) {
-                      selectedUsers.splice(index, 1);
-                    } else {
-                      selectedUsers.push(user);
-                    }
-                  }
-                "
-              >
+              <CommandItem v-for="user in users" :key="user.email" :value="user" class="flex items-center px-2" @select="() => {
+                const index = selectedUsers.findIndex((u) => u === user);
+                if (index !== -1) {
+                  selectedUsers.splice(index, 1);
+                } else {
+                  selectedUsers.push(user);
+                }
+              }
+                ">
                 <Avatar>
                   <AvatarImage :src="user.avatar" alt="Image" />
                   <AvatarFallback>{{ user.name[0] }}</AvatarFallback>
@@ -387,24 +354,14 @@ const selectedUsers = ref<User[]>([]);
                     {{ user.email }}
                   </p>
                 </div>
-                <Check
-                  v-if="selectedUsers.includes(user)"
-                  class="ml-auto flex h-5 w-5 text-primary"
-                />
+                <Check v-if="selectedUsers.includes(user)" class="ml-auto flex h-5 w-5 text-primary" />
               </CommandItem>
             </CommandGroup>
           </CommandList>
         </Command>
         <DialogFooter class="flex items-center border-t p-4 sm:justify-between">
-          <div
-            v-if="selectedUsers.length > 0"
-            class="flex -space-x-2 overflow-hidden"
-          >
-            <Avatar
-              v-for="user in selectedUsers"
-              :key="user.email"
-              class="inline-block border-2 border-background"
-            >
+          <div v-if="selectedUsers.length > 0" class="flex -space-x-2 overflow-hidden">
+            <Avatar v-for="user in selectedUsers" :key="user.email" class="inline-block border-2 border-background">
               <AvatarImage :src="user.avatar" />
               <AvatarFallback>{{ user.name[0] }}</AvatarFallback>
             </Avatar>

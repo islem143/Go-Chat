@@ -45,25 +45,7 @@ const isCollapsed = ref(props.defaultCollapsed)
 const searchValue = ref('')
 const debouncedSearch = refDebounced(searchValue, 250)
 
-const filteredMailList = computed(() => {
-  let output: Mail[] = []
-  const searchValue = debouncedSearch.value?.trim()
-  if (!searchValue) {
-    output = props.mails
-  }
 
-  else {
-    output = props.mails.filter((item) => {
-      return item.name.includes(debouncedSearch.value)
-        || item.email.includes(debouncedSearch.value)
-        || item.name.includes(debouncedSearch.value)
-        || item.subject.includes(debouncedSearch.value)
-        || item.text.includes(debouncedSearch.value)
-    })
-  }
-
-  return output
-})
 
 // const unreadMailList = computed(() => filteredMailList.value.filter(item => !item.read))
 
@@ -81,25 +63,36 @@ function onExpand() {
   isCollapsed.value = false
 }
 
-const selectedUser=ref("");
+const selectedUser = ref("");
 
-const users=await Users.getContacts();
+const users = await Users.getContacts();
 import { useAuth } from "~/store/auth";
 
 const auth = useAuth();
 console.log(auth);
+const filteredUsers = computed(() => {
+  let output: Mail[] = []
+  const searchValue = debouncedSearch.value?.trim()
+  if (!searchValue) {
+    output = users
+  }
 
+  else {
+    output = users.filter((item) => {
+      return item.name.includes(debouncedSearch.value)
+
+    })
+  }
+
+  return output
+})
 
 </script>
 
 <template>
   <TooltipProvider :delay-duration="0">
-    <ResizablePanelGroup
-      id="resize-panel-group-1"
-      direction="horizontal"
-      class="h-full max-h-[800px] items-stretch"
-    >
-      
+    <ResizablePanelGroup id="resize-panel-group-1" direction="horizontal" class="h-full max-h-[800px] items-stretch">
+
       <ResizablePanel id="resize-panel-2" :default-size="defaultLayout[1]" :min-size="25">
         <Tabs default-value="all">
           <div class="flex items-center px-4 py-2">
@@ -107,9 +100,9 @@ console.log(auth);
               Contact List
             </h1>
             <TabsList class="ml-auto">
-            
+
               <TabsTrigger value="all" class="text-zinc-600 dark:text-zinc-200">
-                All 
+                All
               </TabsTrigger>
               <TabsTrigger value="unread" class="text-zinc-600 dark:text-zinc-200">
                 Unread
@@ -126,7 +119,8 @@ console.log(auth);
             </form>
           </div>
           <TabsContent value="all" class="m-0">
-            <ContactList :users="users"  v-model:selected-user="selectedUser" :items="filteredMailList" />
+            <ContactList  :users="filteredUsers" v-model:selected-user="selectedUser" />
+          
           </TabsContent>
           <!-- <TabsContent value="unread" class="m-0">
             <ContactList :users="users" v-model:selected-mail="selectedMail" :items="unreadMailList" />
@@ -134,8 +128,11 @@ console.log(auth);
         </Tabs>
       </ResizablePanel>
       <ResizableHandle id="resiz-handle-2" with-handle />
-      <ResizablePanel id="resize-panel-3" :default-size="defaultLayout[2]">
-        <ChatDisplay :selectedUser="selectedUser" />
+      <ResizablePanel class="bg-slate-100 " id="resize-panel-3" :default-size="defaultLayout[2]">
+        <ChatDisplay v-if="selectedUser" :selectedUser="selectedUser" />
+        <div v-else class="grid  h-full justify-center  content-center">
+          <p class="bg-slate-200 py-2 px-5 rounded-md w-40 text-center">Select a chat.</p>
+        </div>
       </ResizablePanel>
     </ResizablePanelGroup>
   </TooltipProvider>

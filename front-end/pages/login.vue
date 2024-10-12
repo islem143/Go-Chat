@@ -21,7 +21,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-import { h,ref } from "vue";
+import { h, ref } from "vue";
 import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
@@ -32,9 +32,9 @@ import { useAuth } from "~/store/auth";
 const auth = useAuth();
 const email = ref('')
 const password = ref('')
-watch(email,(val)=>{
-  console.log(val,"----");
-  
+watch(email, (val) => {
+  console.log(val, "----");
+
 })
 // const formSchema = toTypedSchema(
 //   z.object({
@@ -48,15 +48,17 @@ watch(email,(val)=>{
 const loading = useLoading();
 
 
-const login = ()=>{
+const login = () => {
   console.log("email");
-  
+
   auth
     .login({
       email: email.value,
       password: password.value,
     })
     .then(() => {
+
+
       navigateTo("/");
     });
 }
@@ -82,12 +84,7 @@ const login = ()=>{
             <FormItem>
               <FormLabel>email</FormLabel>
               <FormControl>
-                <input
-                  v-model="email"
-                  type="text"
-                  placeholder="email"
-                  v-bind="componentField"
-                />
+                <input v-model="email" type="text" placeholder="email" v-bind="componentField" />
               </FormControl>
 
               <FormMessage />
@@ -99,27 +96,15 @@ const login = ()=>{
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <input
-                  v-model="password"
-                  type="password"
-                  placeholder="password"
-                  v-bind="componentField"
-                />
+                <input v-model="password" type="password" placeholder="password" v-bind="componentField" />
               </FormControl>
 
               <FormMessage />
             </FormItem>
           </FormField>
         </div>
-        <Button
-          :disabled="loading.loading[Actions.Login]"
-          @click="login"
-          class="w-full"
-        >
-          <Loader2
-            v-if="loading.loading[Actions.Login]"
-            class="w-4 h-4 mr-2 animate-spin"
-          />
+        <Button :disabled="loading.loading[Actions.Login]" @click="login" class="w-full">
+          <Loader2 v-if="loading.loading[Actions.Login]" class="w-4 h-4 mr-2 animate-spin" />
           Login
         </Button>
       </div>

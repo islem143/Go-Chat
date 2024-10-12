@@ -15,23 +15,19 @@ const props = defineProps<UsersList>();
 const selectedUser = defineModel<string>("selectedUser", { required: true });
 
 
+
 </script>
 
 <template>
   <ScrollArea class="h-screen flex">
-    <div class="flex-1 flex flex-col gap-2 p-4 pt-0">
+    <div v-if="users.length != 0" class="flex-1 flex flex-col gap-2 p-4 pt-0">
       <TransitionGroup name="list" appear>
-        <button
-          v-for="item of users"
-          :key="item.id"
-          :class="
-            cn(
-              'flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent',
-              selectedUser === item.id && 'bg-muted'
-            )
-          "
-          @click="selectedUser = item"
-        >
+        <button v-for="item of users" :key="item.id" :class="cn(
+          'flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent',
+          selectedUser === item && 'bg-blue-200'
+        )
+          " @click="selectedUser = item">
+
           <div class="flex w-full flex-col gap-1">
             <!-- <Avatar>
           <AvatarImage src="/avatars/01.png" alt="Image" />
@@ -47,16 +43,13 @@ const selectedUser = defineModel<string>("selectedUser", { required: true });
                   class="flex h-2 w-2 rounded-full bg-blue-600"
                 /> -->
               </div>
-              <div
-                :class="
-                  cn(
-                    'ml-auto text-xs',
-                    selectedUser === item.id
-                      ? 'text-foreground'
-                      : 'text-muted-foreground'
-                  )
-                "
-              >
+              <div :class="cn(
+                'ml-auto text-xs',
+                selectedUser === item.id
+                  ? 'text-foreground'
+                  : 'text-muted-foreground'
+              )
+                ">
                 <!-- {{
                   formatDistanceToNow(new Date(item.date), { addSuffix: true })
                 }} -->
@@ -77,6 +70,10 @@ const selectedUser = defineModel<string>("selectedUser", { required: true });
           </div>
         </button>
       </TransitionGroup>
+    </div>
+    <div v-else>
+      <p class="p-4"> Users not found.
+      </p>
     </div>
   </ScrollArea>
 </template>
