@@ -15,6 +15,7 @@ type Message struct {
 	Message    string `json:"message"`
 	ReceiverId string `json:"receiver"`
 	UserId     string `json:"user_id"`
+	Type       string `json:"type"`
 }
 
 type MessageLogin struct {
@@ -94,7 +95,12 @@ func Setup(app *fiber.App) {
 				log.Println("read:", err)
 				break
 			}
-			if message.Message == "" {
+			if message.Type == "typing" {
+				log.Println(authUser.Name)
+				log.Println("yes he is typing")
+
+			}
+			if message.Message == "" && message.Type != "typing" {
 
 				continue
 			}
@@ -103,12 +109,16 @@ func Setup(app *fiber.App) {
 				Text:       message.Message,
 				UserId:     authUser.ID,
 				Read:       false,
+				Type:       message.Type,
 			}
-			err := models.InsertMessages(&msg)
-			if err != nil {
-				return
-			}
+			if message.Type != "typing" {
 
+				err := models.InsertMessages(&msg)
+				if err != nil {
+					return
+				}
+			}
+			log.Println("-------------")
 			_, ok = pool.Clients[message.ReceiverId]
 
 			if !ok {

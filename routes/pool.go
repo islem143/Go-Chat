@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"log"
+
 	"github.com/gofiber/contrib/websocket"
 	"github.com/islem143/go-chat/models"
 )
@@ -29,12 +31,13 @@ func (p *Pool) Start() {
 
 		msg := <-p.Messages
 		recevierId := msg.ReceiverId
-
+		log.Println(msg.Type)
 		val, ok := p.Clients[recevierId]
 		if ok {
+
 			//f := primitive.E{Key: "read", Value: true}
 			//models.UpdateMessages(msg, f)
-			val.conn.WriteJSON((msg.Text))
+			val.conn.WriteJSON((msg))
 
 		}
 

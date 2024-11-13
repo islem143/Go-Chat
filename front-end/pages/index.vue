@@ -20,11 +20,11 @@ import { accounts, mails } from '../components/data/mail'
       class="block dark:hidden"
     />
   </div>
-  <div class="hidden flex-col md:flex">
+  <div class=" flex-col md:flex">
     <Chat
       :accounts="accounts"
    
-      :nav-collapsed-size="4"
+   
     />
   </div>
 </template>

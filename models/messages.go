@@ -13,6 +13,7 @@ type Message struct {
 	Read       bool   `json:"read" bson:"read,omitempty"`
 	UserId     string `json:"user_id" bson:"user_id,omitempty"`
 	Text       string `json:"text" bson:"text,omitempty"`
+	Type       string `json:"type"`
 }
 
 func (user *Message) CollectionName() string {
