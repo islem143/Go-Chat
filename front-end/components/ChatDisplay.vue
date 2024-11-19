@@ -65,6 +65,7 @@ const sendMessage = (event, type = 'message') => {
 
   socket.send(JSON.stringify(msg));
   if (type != "typing") {
+    
     messages.value.push({
       role: "user",
       content: input.value,
@@ -86,7 +87,7 @@ socket.onmessage = (msg) => {
     timeoutId = setTimeout(() => {
 
       showTyping.value = false;
-    }, 1000);
+    }, 500);
   } else {
 
     messages.value.push({ role: "other", content: res.text, type: 'message' });
@@ -124,7 +125,7 @@ const handleTyping = (e) => {
 </script>
 
 <template>
-  <div class="h-max-[200px] flex h-full flex-col bg-background mt-4 md:mt-0 md:p-4">
+  <div class="h-max-[200px] flex h-full flex-col  mt-4 md:mt-0 md:p-4">
     <!-- <div class="flex items-center p-2">
 
       <div class="ml-auto flex items-center gap-2">
@@ -178,15 +179,15 @@ const handleTyping = (e) => {
             </p>
           
           </div>
-          <p v-if=showTyping>
-            <div class="chat-bubble">
+         
+            <div v-if="showTyping" class="chat-bubble">
               <div class="typing">
                 <div class="dot"></div>
                 <div class="dot"></div>
                 <div class="dot"></div>
               </div>
             </div>
-            </p>
+   
         </div>
       </CardContent>
       <CardFooter>
@@ -210,8 +211,8 @@ const handleTyping = (e) => {
 
 <style>
 .chat-bubble {
-  background-color: #E6F8F1;
-  padding: 16px 28px;
+  background-color: #fff;
+  padding: 8px 8px;
   -webkit-border-radius: 20px;
   -webkit-border-bottom-left-radius: 2px;
   -moz-border-radius: 20px;
@@ -224,12 +225,12 @@ const handleTyping = (e) => {
 .typing {
   align-items: center;
   display: flex;
-  height: 17px;
+  height: 12px;
 }
 
 .typing .dot {
   animation: mercuryTypingAnimation 1.8s infinite ease-in-out;
-  background-color: #6CAD96;
+  background-color: #000;
   border-radius: 50%;
   height: 7px;
   margin-right: 4px;
@@ -257,17 +258,17 @@ const handleTyping = (e) => {
 @keyframes mercuryTypingAnimation {
   0% {
     transform: translateY(0px);
-    background-color: #6CAD96;
+
   }
 
   28% {
     transform: translateY(-7px);
-    background-color: #9ECAB9;
+   
   }
 
   44% {
     transform: translateY(0px);
-    background-color: #B5D9CB;
+
   }
 }
 </style>

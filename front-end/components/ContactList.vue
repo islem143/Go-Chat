@@ -22,7 +22,7 @@ const selectedUser = defineModel<string>("selectedUser", { required: true });
       <TransitionGroup name="list" appear>
         <button v-for="item of users" :key="item.id" :class="cn(
           'flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent',
-          selectedUser === item && 'bg-blue-200'
+          selectedUser === item && 'bg-gray-800'
         )
           " @click="selectedUser = item">
 

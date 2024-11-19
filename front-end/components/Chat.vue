@@ -98,7 +98,7 @@ const filteredUsers = computed(() => {
     <div class="col-span-2 md:col-span-4  max-h-[800px] ">
       <ChatDisplay v-if="selectedUser" :selectedUser="selectedUser" />
       <div v-else class="grid  h-full justify-center  content-center">
-        <p class="bg-slate-200 py-2 px-5 rounded-md w-40 text-center">Select a chat.</p>
+        <p class=" py-2 px-5 rounded-md w-40 text-center">Select a chat.</p>
       </div>
     </div>
   </div>
