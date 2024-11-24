@@ -50,7 +50,7 @@ const users = await Users.getContacts();
 
 
 const auth = useAuth();
-console.log(auth);
+
 const filteredUsers = computed(() => {
   let output: Mail[] = []
   const searchValue = debouncedSearch.value?.trim()

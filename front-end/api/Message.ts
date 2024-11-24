@@ -1,5 +1,5 @@
 
-import type { ApiResponseList, ChatMessageBody, LoginBody, RegisterBody } from "~/types";
+import type { ApiResponseList, ChatMessageBody, LoginBody, MarkAsReadBody, RegisterBody } from "~/types";
 import Abstract from "./abstract";
 import { Actions } from "~/constants/actions";
 
@@ -11,7 +11,11 @@ export class Message extends Abstract {
         return res.list;
     }
 
+    static async markAsRead(data: MarkAsReadBody) {
+        const res = await this.post("/messages/mark-as-read", {messageId: data.messageId, receiverId: data.receiverId }, Actions.MarkAsRead);
 
+        return res;
+    }
 }
 
 

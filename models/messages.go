@@ -7,10 +7,15 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+const (
+	READ   = "read"
+	UNREAD = "unread"
+)
+
 type Message struct {
 	BaseModel  `bson:",inline"`
 	ReceiverId string `json:"receiver_id" bson:"receiver_id,omitempty"`
-	Read       bool   `json:"read" bson:"read,omitempty"`
+	Status     string `json:"status" bson:"status,omitempty"`
 	UserId     string `json:"user_id" bson:"user_id,omitempty"`
 	Text       string `json:"text" bson:"text,omitempty"`
 	Type       string `json:"type"`
@@ -30,6 +35,21 @@ func FindMessages(filter bson.D, opts *options.FindOptions) (*[]Message, error) 
 	}
 	return messages, nil
 }
+func FindMessage(value string) (*Message, error) {
+	objectId, err := primitive.ObjectIDFromHex(value)
+	if err != nil {
+		return nil, myerrors.DbErrors(err)
+	}
+	filter := bson.M{"_id": objectId}
+	message := &Message{}
+	err = FindOne(message.CollectionName(), filter, message)
+	if err != nil {
+
+		return nil, myerrors.DbErrors(err)
+	}
+	return message, nil
+}
+
 func InsertMessages(message *Message) error {
 	err := Insert(message.CollectionName(), message)
 	if err != nil {
@@ -60,6 +80,7 @@ func NewMessage(user_id string, receiver_id string, message string) *Message {
 		Text:       message,
 		UserId:     user_id,
 		ReceiverId: receiver_id,
+		Status:     UNREAD,
 	}
 	return model
 }

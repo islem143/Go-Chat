@@ -3,51 +3,74 @@ import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Icon } from '@iconify/vue'
 
-const colorMode = useColorMode()
+const colorMode = useColorMode();
+colorMode.preference='light'
 </script>
 <template>
   <div class="flex min-h-screen w-full flex-col">
+    <header class="sticky top-0 z-50 flex h-16 items-center border-b bg-white shadow-sm">
+      <div class="container mx-auto flex items-center justify-between px-4">
+        <div class="flex items-center gap-6">
+          <NuxtLink to="/" class="flex items-center gap-2 text-xl font-bold text-blue-600">
+            <Icon icon="heroicons:chat-bubble-left-right" class="h-6 w-6" />
+            ChatApp
+          </NuxtLink>
+          
+          <nav class="hidden md:flex items-center gap-6">
+            <NuxtLink 
+              to="/" 
+              class="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors"
+            >
+              Home
+            </NuxtLink>
+            <NuxtLink 
+              to="/chat" 
+              class="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors"
+            >
+              Chat
+            </NuxtLink>
+          </nav>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <NuxtLink 
+            to="/login"
+            class="hidden md:inline-flex text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-full transition-colors"
+          >
+            Sign In
+          </NuxtLink>
+
+          <!-- Mobile Menu -->
+          <Button variant="ghost" size="icon" class="md:hidden" @click="() => {}">
+            <Icon icon="heroicons:bars-3" class="h-6 w-6" />
+          </Button>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1">
+      <slot />
+    </main>
+  </div>
+  <!-- <div class="flex min-h-screen w-full flex-col">
     <header class="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
       <nav
         class="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
         <a class="flex items-center gap-2 text-lg font-semibold md:text-base">
-          <!-- <DropdownMenu>
-    <DropdownMenuTrigger as-child>
-      <Button variant="outline">
-        <Icon icon="radix-icons:moon" class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-        <Icon icon="radix-icons:sun" class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-        <span class="sr-only">Toggle theme</span>
-      </Button>
-    </DropdownMenuTrigger>
-    <DropdownMenuContent align="end">
-      <DropdownMenuItem @click="colorMode.preference = 'light'">
-        Light
-      </DropdownMenuItem>
-      <DropdownMenuItem @click="colorMode.preference = 'dark'">
-        Dark
-      </DropdownMenuItem>
-      <DropdownMenuItem @click="colorMode.preference = 'system'">
-        System
-      </DropdownMenuItem>
-    </DropdownMenuContent>
-  </DropdownMenu> -->
+       
         </a>
-
+      <a href="#" class="text-foreground transition-colors hover:text-foreground">
+        <NuxtLink to="/">Home</NuxtLink>
+      </a>
 
         <a href="#" class="text-foreground transition-colors hover:text-foreground">
-          <NuxtLink to="/">Chat</NuxtLink>
+          <NuxtLink to="/chat">Chat</NuxtLink>
         </a>
         <a href="#" class="text-foreground transition-colors hover:text-foreground">
           <NuxtLink to="/login">Login</NuxtLink>
         </a>
 
-        <!-- <a
-          href="#"
-          class="text-muted-foreground transition-colors hover:text-foreground"
-        >
-        <NuxtLink to="/transactions">Chat</NuxtLink>
-        </a> -->
-
+    
       </nav>
       <Sheet>
         <SheetTrigger as-child>
@@ -104,5 +127,5 @@ const colorMode = useColorMode()
     </header>
 
     <slot />
-  </div>
+  </div> -->
 </template>

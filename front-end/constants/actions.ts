@@ -2,6 +2,6 @@ export enum Actions {
   Login = "Login",
   Register = "Register",
   GetUsers = "GetUsers",
-  GetChatMessages="GetChatMessages"
-
+  GetChatMessages = "GetChatMessages",
+  MarkAsRead = "MarkAsRead",
 }

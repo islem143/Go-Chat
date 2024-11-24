@@ -70,7 +70,72 @@ const login = () => {
 </script>
 
 <template>
-  <Card class="mx-auto mt-8">
+  <div class="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <Card class="w-full max-w-md">
+      <CardHeader>
+        <CardTitle class="text-2xl font-bold text-center text-gray-900">
+          Welcome back
+        </CardTitle>
+        <CardDescription class="text-center text-gray-600">
+          Sign in to your account to continue
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form @submit.prevent="login" class="space-y-6">
+          <div class="space-y-4">
+            <FormField v-slot="{ componentField }" name="email">
+              <FormItem>
+                <FormLabel class="text-sm font-medium text-gray-700">Email address</FormLabel>
+                <FormControl>
+                  <Input
+                    v-model="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    class="w-full"
+                    v-bind="componentField"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+
+            <FormField v-slot="{ componentField }" name="password">
+              <FormItem>
+                <FormLabel class="text-sm font-medium text-gray-700">Password</FormLabel>
+                <FormControl>
+                  <Input
+                    v-model="password"
+                    type="password"
+                    placeholder="••••••••"
+                    class="w-full"
+                    v-bind="componentField"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+          </div>
+
+          <Button 
+            type="submit"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            :disabled="loading.loading[Actions.Login]"
+          >
+            <Loader2 v-if="loading.loading[Actions.Login]" class="w-4 h-4 mr-2 animate-spin" />
+            Sign in
+          </Button>
+
+          <p class="text-center text-sm text-gray-600">
+            Don't have an account?
+            <NuxtLink to="/register" class="font-medium text-blue-600 hover:text-blue-500">
+              Sign up
+            </NuxtLink>
+          </p>
+        </form>
+      </CardContent>
+    </Card>
+  </div>
+  <!-- <Card class="mx-auto mt-8">
     <CardHeader>
       <CardTitle class="text-xl"> Sign Up </CardTitle>
       <CardDescription>
@@ -114,5 +179,5 @@ const login = () => {
         <NuxtLink to="/register" class="underline"> Sign up</NuxtLink>
       </div>
     </CardContent>
-  </Card>
+  </Card> -->
 </template>

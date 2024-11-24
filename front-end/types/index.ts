@@ -21,5 +21,12 @@ export interface User {
 
 export interface ChatMessageBody {
 
-  receiverId: string
+  receiverId: string | null,
+  userId: string | null
+}
+
+export interface MarkAsReadBody {
+  messageId: string,
+  receiverId: string,
+
 }

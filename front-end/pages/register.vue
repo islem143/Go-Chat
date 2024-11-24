@@ -54,7 +54,88 @@ const signUp = handleSubmit((values) => {
 </script>
 
 <template>
-  <Card class="mx-auto mt-8">
+  <div class="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <Card class="w-full max-w-md">
+      <CardHeader>
+        <CardTitle class="text-2xl font-bold text-center text-gray-900">
+          Create your account
+        </CardTitle>
+        <CardDescription class="text-center text-gray-600">
+          Enter your information below to get started
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form @submit.prevent="signUp" class="space-y-6">
+          <div class="space-y-4">
+            <FormField v-slot="{ componentField }" name="name">
+              <FormItem>
+                <FormLabel class="text-sm font-medium text-gray-700">Full Name</FormLabel>
+                <FormControl>
+                  <Input
+                    v-model="formData.name"
+                    type="text"
+                    placeholder="John Doe"
+                    class="w-full"
+                    v-bind="componentField"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+
+            <FormField v-slot="{ componentField }" name="email">
+              <FormItem>
+                <FormLabel class="text-sm font-medium text-gray-700">Email address</FormLabel>
+                <FormControl>
+                  <Input
+                    v-model="formData.email"
+                    type="email"
+                    placeholder="you@example.com"
+                    class="w-full"
+                    v-bind="componentField"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+
+            <FormField v-slot="{ componentField }" name="password">
+              <FormItem>
+                <FormLabel class="text-sm font-medium text-gray-700">Password</FormLabel>
+                <FormControl>
+                  <Input
+                    v-model="formData.password"
+                    type="password"
+                    placeholder="••••••••"
+                    class="w-full"
+                    v-bind="componentField"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+          </div>
+
+          <Button 
+            type="submit" 
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            :disabled="loading.loading[Actions.Register]"
+          >
+            <Loader2 v-if="loading.loading[Actions.Register]" class="w-4 h-4 mr-2 animate-spin" />
+            Create Account
+          </Button>
+
+          <p class="text-center text-sm text-gray-600">
+            Already have an account?
+            <NuxtLink to="/login" class="font-medium text-blue-600 hover:text-blue-500">
+              Sign in
+            </NuxtLink>
+          </p>
+        </form>
+      </CardContent>
+    </Card>
+  </div>
+  <!-- <Card class="mx-auto mt-8">
     <CardHeader>
       <CardTitle class="text-xl"> Sign Up </CardTitle>
       <CardDescription>
@@ -129,5 +210,5 @@ const signUp = handleSubmit((values) => {
         <NuxtLink to="/login" class="underline"> Sign in</NuxtLink>
       </div>
     </CardContent>
-  </Card>
+  </Card> -->
 </template>

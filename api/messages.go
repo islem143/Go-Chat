@@ -4,9 +4,11 @@ import (
 	"fmt"
 
 	"github.com/gofiber/fiber/v2"
+	myerrors "github.com/islem143/go-chat/Errors"
 	"github.com/islem143/go-chat/models"
 	"github.com/islem143/go-chat/validation"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -21,7 +23,7 @@ func GetMessages(c *fiber.Ctx) error {
 
 	opts := options.Find().SetSort(bson.D{{Key: "created_Value: at", Value: -1}})
 	authUser := c.Locals("user").(*models.User)
-	fmt.Println(authUser.ID)
+
 	//      bson.D{{Key: "user_id", Value: authUser.ID}},
 	// 		bson.D{{Key: "user_id", Value: m["receiver_id"]}}
 	filter := bson.D{{
@@ -72,4 +74,28 @@ func InsertMessage(c *fiber.Ctx) error {
 		return err
 	}
 	return c.JSON(message)
+}
+func MarkAsRead(c *fiber.Ctx) error {
+	var data map[string]string
+
+	if err := c.BodyParser(&data); err != nil {
+		return err
+
+	}
+	authUser := c.Locals("user").(*models.User)
+
+	message, err := models.FindMessage(data["messageId"])
+
+	if message.UserId != authUser.ID {
+		return myerrors.UnauthorizedError()
+	}
+
+	if err != nil {
+		return err
+
+	}
+	message.Status = models.READ
+	f := primitive.E{Key: "status", Value: models.READ}
+	models.UpdateMessages(message, f)
+	return c.JSON("ok")
 }

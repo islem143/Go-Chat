@@ -35,6 +35,7 @@ func Setup(app *fiber.App) {
 	api.Post("contacts/", apis.AddContact)
 	api.Get("users/:id", apis.One)
 	api.Post("users/logout", apis.Logout)
+	api.Post("messages/mark-as-read", apis.MarkAsRead)
 	//api.Use(middlewares.HasRole(types.ADMIN))
 	app.Use("/ws", func(c *fiber.Ctx) error {
 		// IsWebocketUpgrade returns true if the client
@@ -108,7 +109,7 @@ func Setup(app *fiber.App) {
 				ReceiverId: message.ReceiverId,
 				Text:       message.Message,
 				UserId:     authUser.ID,
-				Read:       false,
+				Status:     models.UNREAD,
 				Type:       message.Type,
 			}
 			if message.Type != "typing" {
