@@ -140,36 +140,39 @@ watch(props, () => {
 getMessages();
 
 });  
-// watch(messagesRefs, () => {
-//   if (messagesRefs) {
-//     setTimeout(()=>{
-//       const target = messagesRefs.value[messagesRefs.value?.length - 1];
-  
+watch(messagesRefs, () => {
+  if (messagesRefs) {
+    setTimeout(()=>{
+      const target = messagesRefs.value[messagesRefs.value?.length - 1];
+      let lastMessage = messages.value[messages.value?.length - 1];
+      if(lastMessage.role == 'other'){
+        
+      }
    
     
     
-//     const { stop } = useIntersectionObserver(
-//       target,
-//       ([{ isIntersecting }], observerElement) => {
-//         if (isIntersecting) {
+    const { stop } = useIntersectionObserver(
+      target,
+      ([{ isIntersecting }], observerElement) => {
+        if (isIntersecting) {
           
-//           let lastMessage = messages.value[messages.value?.length - 1];
+          let lastMessage = messages.value[messages.value?.length - 1];
           
         
           
           
           
-//           Message.markAsRead({ messageId: lastMessage.id,receiverId: props.selectedUser.id });
-//         }
-//       },
-//     )
-//     },100)
+          Message.markAsRead({ messageId: lastMessage.id,receiverId: props.selectedUser.id });
+        }
+      },
+    )
+    },100)
     
 
 
-//   }
+  }
 
-// })
+})
 // onMounted(() => {
 
 //   setTimeout(() => {
@@ -225,7 +228,7 @@ const handleTyping = (e) => {
                )">
             <p v-if="message.type != 'typing'" class="break-words">
               {{ message.content }}
-              <span class="flex justify-end gap-1 text-xs mt-1" :class="message.role === 'user' ? 'text-blue-100' : 'text-gray-400'">
+              <span v-if="message.role=='user'" class="flex justify-end gap-1 text-xs mt-1" :class="message.role === 'user' ? 'text-blue-100' : 'text-gray-400'">
                 <span v-if="message.status === 'unread'">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3"><polyline points="20 6 9 17 4 12"/></svg>
                 </span>
@@ -237,11 +240,11 @@ const handleTyping = (e) => {
           </div>
 
           <div v-if="showTyping" 
-               class="flex w-max max-w-[75%] flex-col gap-2 rounded-2xl px-4 py-3 bg-white shadow-sm">
+               class="flex w-max max-w-[75%] flex-col gap-2 rounded-2xl px-3 py-2 bg-blue-400 shadow-sm">
             <div class="flex space-x-1">
-              <div class="w-2 h-2 rounded-full bg-gray-400 animate-bounce"></div>
-              <div class="w-2 h-2 rounded-full bg-gray-400 animate-bounce [animation-delay:0.2s]"></div>
-              <div class="w-2 h-2 rounded-full bg-gray-400 animate-bounce [animation-delay:0.4s]"></div>
+              <div class="w-2 h-2 rounded-full bg-white animate-bounce "></div>
+              <div class="w-2 h-2 rounded-full bg-white animate-bounce  [animation-delay:0.2s]"></div>
+              <div class="w-2 h-2 rounded-full bg-white animate-bounce  [animation-delay:0.4s]"></div>
             </div>
           </div>
 

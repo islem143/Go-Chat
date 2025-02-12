@@ -65,7 +65,7 @@ const signUp = handleSubmit((values) => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form @submit.prevent="signUp" class="space-y-6">
+       
           <div class="space-y-4">
             <FormField v-slot="{ componentField }" name="name">
               <FormItem>
@@ -120,6 +120,7 @@ const signUp = handleSubmit((values) => {
             type="submit" 
             class="w-full bg-blue-600 hover:bg-blue-700 text-white"
             :disabled="loading.loading[Actions.Register]"
+            @click="signUp"
           >
             <Loader2 v-if="loading.loading[Actions.Register]" class="w-4 h-4 mr-2 animate-spin" />
             Create Account
@@ -131,7 +132,7 @@ const signUp = handleSubmit((values) => {
               Sign in
             </NuxtLink>
           </p>
-        </form>
+ 
       </CardContent>
     </Card>
   </div>
