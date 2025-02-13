@@ -59,7 +59,7 @@ func InsertMessages(message *Message) error {
 	return nil
 }
 
-func UpdateMessages(message *Message, feilds primitive.E) error {
+func UpdateMessage(message *Message, feilds primitive.E) error {
 	objectId, err := primitive.ObjectIDFromHex(message.ID)
 	if err != nil {
 		return myerrors.DbErrors(err)
@@ -68,6 +68,18 @@ func UpdateMessages(message *Message, feilds primitive.E) error {
 	update := bson.D{{Key: "$set", Value: bson.D{feilds}}}
 	filter := bson.M{"_id": objectId}
 	err = Update(message.CollectionName(), filter, update)
+	if err != nil {
+
+		return myerrors.DbErrors(err)
+	}
+	return nil
+}
+
+func UpdateMessages(feilds primitive.E, filter bson.M) error {
+
+	update := bson.D{{Key: "$set", Value: bson.D{feilds}}}
+
+	err := UpdateMany("messages", filter, update)
 	if err != nil {
 
 		return myerrors.DbErrors(err)

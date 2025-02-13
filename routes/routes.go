@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/gofiber/contrib/websocket"
@@ -66,7 +65,7 @@ func Setup(app *fiber.App) {
 			return
 		}
 		authUser := c.Locals("user").(*models.User)
-		fmt.Println(authUser, "auth")
+
 		// if authUser.ID != id {
 		// 	return
 		// }
@@ -97,7 +96,7 @@ func Setup(app *fiber.App) {
 				break
 			}
 			if message.Type == "typing" {
-				log.Println(authUser.Name)
+
 				log.Println("yes he is typing")
 
 			}
@@ -119,7 +118,7 @@ func Setup(app *fiber.App) {
 					return
 				}
 			}
-			log.Println("-------------")
+
 			_, ok = pool.Clients[message.ReceiverId]
 
 			if !ok {

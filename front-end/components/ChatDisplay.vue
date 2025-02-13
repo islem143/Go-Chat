@@ -145,8 +145,7 @@ watch(messagesRefs, () => {
     setTimeout(() => {
       const target = messagesRefs.value[messagesRefs.value?.length - 1];
       let lastMessage = messages.value[messages.value?.length - 1];
-      if (lastMessage.role == 'other') {
-        Message.markAsRead({ messageId: null, readAllLatest: true, receiverId: props.selectedUser.id });
+      if (lastMessage.role != 'other') {
         return
       }
 

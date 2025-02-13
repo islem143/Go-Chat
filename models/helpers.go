@@ -74,3 +74,14 @@ func Update(collection string, filter bson.M, update primitive.D) error {
 	}
 	return nil
 }
+
+func UpdateMany(collection string, filter bson.M, update primitive.D) error {
+	opts := options.Update().SetUpsert(true)
+	coll := database.Client.Database(database.Database).Collection(collection)
+
+	_, err := coll.UpdateMany(context.TODO(), filter, update, opts)
+	if err != nil {
+		return err
+	}
+	return nil
+}

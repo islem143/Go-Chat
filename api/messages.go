@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/gofiber/fiber/v2"
-	myerrors "github.com/islem143/go-chat/Errors"
 	"github.com/islem143/go-chat/models"
 	"github.com/islem143/go-chat/validation"
 	"go.mongodb.org/mongo-driver/bson"
@@ -89,22 +88,23 @@ func MarkAsRead(c *fiber.Ctx) error {
 
 	}
 	authUser := c.Locals("user").(*models.User)
-	if data.ReadAllLatest {
-		fmt.Println("readAllLatest")
-		return c.JSON("ok")
-	}
-	message, err := models.FindMessage(data.MessageId)
 
-	if message.UserId != authUser.ID {
-		return myerrors.UnauthorizedError()
-	}
-
-	if err != nil {
-		return err
-
-	}
-	message.Status = models.READ
 	f := primitive.E{Key: "status", Value: models.READ}
-	models.UpdateMessages(message, f)
+	models.UpdateMessages(f, bson.M{"user_id": data.ReceiverId, "receiver_id": authUser.ID})
 	return c.JSON("ok")
+
+	// message, err := models.FindMessage(data.MessageId)
+
+	// if message.UserId != authUser.ID {
+	// 	return myerrors.UnauthorizedError()
+	// }
+
+	// if err != nil {
+	// 	return err
+
+	// }
+	// message.Status = models.READ
+	// f := primitive.E{Key: "status", Value: models.READ}
+	// models.UpdateMessage(message, f)
+	//return c.JSON("ok")
 }
