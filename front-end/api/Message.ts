@@ -12,7 +12,7 @@ export class Message extends Abstract {
     }
 
     static async markAsRead(data: MarkAsReadBody) {
-        const res = await this.post("/messages/mark-as-read", {messageId: data.messageId, receiverId: data.receiverId }, Actions.MarkAsRead);
+        const res = await this.post("/messages/mark-as-read", {messageId: data.messageId, readAllLatest:data.readAllLatest,receiverId: data.receiverId }, Actions.MarkAsRead);
 
         return res;
     }

@@ -26,7 +26,8 @@ export interface ChatMessageBody {
 }
 
 export interface MarkAsReadBody {
-  messageId: string,
+  messageId: string | null,
   receiverId: string,
+  readAllLatest: boolean
 
 }

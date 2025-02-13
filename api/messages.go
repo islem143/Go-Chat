@@ -17,6 +17,12 @@ type GetMessageRequsetBody struct {
 	UserId     string `json:"user_id"` // This could be any type
 }
 
+type UpdateMessageRequestBody struct {
+	MessageId     string `json:"messageId"`
+	ReceiverId    string `json:"receiverId"`
+	ReadAllLatest bool   `json:"readAllLatest"`
+}
+
 func GetMessages(c *fiber.Ctx) error {
 
 	m := c.Queries()
@@ -76,15 +82,18 @@ func InsertMessage(c *fiber.Ctx) error {
 	return c.JSON(message)
 }
 func MarkAsRead(c *fiber.Ctx) error {
-	var data map[string]string
+	var data UpdateMessageRequestBody
 
 	if err := c.BodyParser(&data); err != nil {
 		return err
 
 	}
 	authUser := c.Locals("user").(*models.User)
-
-	message, err := models.FindMessage(data["messageId"])
+	if data.ReadAllLatest {
+		fmt.Println("readAllLatest")
+		return c.JSON("ok")
+	}
+	message, err := models.FindMessage(data.MessageId)
 
 	if message.UserId != authUser.ID {
 		return myerrors.UnauthorizedError()
